@@ -1,3 +1,4 @@
+import React from 'react';
 import { useMAGStore } from '../../../store/useMAGStore';
 import { t } from '../../../i18n';
 import { MAGNode } from './MAGNode';
@@ -78,9 +79,8 @@ export function MAGGrid() {
                   </div>
                 ))}
                 {sectors.map(s => (
-                  <>
+                  <React.Fragment key={s}>
                     <div
-                      key={`label-${s}`}
                       className="flex items-center justify-center text-sm font-bold"
                       style={{ minHeight: 110, color: 'var(--accent2)' }}
                     >
@@ -94,7 +94,7 @@ export function MAGGrid() {
                         animDelay={pi * 0.05 + sectors.indexOf(s) * 0.03}
                       />
                     ))}
-                  </>
+                  </React.Fragment>
                 ))}
               </div>
             </div>
