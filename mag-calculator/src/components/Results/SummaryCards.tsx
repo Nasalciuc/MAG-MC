@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { t } from '../../i18n';
 import type { CalcSummary } from '../../lib/types';
@@ -39,12 +39,21 @@ export function SummaryCards() {
   const lang = useMAGStore(s => s.lang);
   const tr = t(lang);
   const [showSkeleton, setShowSkeleton] = useState(false);
+  const prevResultRef = useRef(result);
+
+  if (result !== prevResultRef.current) {
+    prevResultRef.current = result;
+    if (!showSkeleton) {
+      setShowSkeleton(true);
+    }
+  }
 
   useEffect(() => {
-    setShowSkeleton(true);
-    const timer = setTimeout(() => setShowSkeleton(false), 200);
-    return () => clearTimeout(timer);
-  }, [result]);
+    if (showSkeleton) {
+      const timer = setTimeout(() => setShowSkeleton(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [showSkeleton]);
 
   if (!result) return null;
   const s: CalcSummary = result.summary;

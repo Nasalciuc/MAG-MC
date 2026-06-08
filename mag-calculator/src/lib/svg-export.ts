@@ -7,9 +7,9 @@ export function resolveCSVarsInSVG(svgEl: SVGSVGElement): SVGSVGElement {
   const computed = getComputedStyle(document.documentElement);
 
   function resolveValue(val: string): string {
-    const match = val.match(/var\(--([^)]+)\)/);
-    if (!match) return val;
-    return computed.getPropertyValue(`--${match[1]}`).trim() || val;
+    return val.replace(/var\(--([^)]+)\)/g, (_, name) => {
+      return computed.getPropertyValue(`--${name}`).trim() || `var(--${name})`;
+    });
   }
 
   clone.querySelectorAll('*').forEach(el => {
@@ -43,26 +43,50 @@ export async function exportSVGAsPNG(svgEl: SVGSVGElement, filename: string): Pr
   const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
 
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    const scale = 2;
-    canvas.width = img.naturalWidth * scale;
-    canvas.height = img.naturalHeight * scale;
-    const ctx = canvas.getContext('2d')!;
-    ctx.scale(scale, scale);
-    ctx.drawImage(img, 0, 0);
+  return new Promise<void>((resolve, reject) => {
+    const img = new Image();
 
-    canvas.toBlob(pngBlob => {
-      if (!pngBlob) return;
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(pngBlob);
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }, 'image/png');
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      console.error('SVG export: image load failed');
+      reject(new Error('Nu s-a putut genera imaginea din SVG.'));
+    };
 
-    URL.revokeObjectURL(url);
-  };
-  img.src = url;
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const scale = 2;
+        canvas.width = img.naturalWidth * scale;
+        canvas.height = img.naturalHeight * scale;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          URL.revokeObjectURL(url);
+          reject(new Error('Canvas context indisponibil.'));
+          return;
+        }
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0);
+
+        canvas.toBlob(pngBlob => {
+          URL.revokeObjectURL(url);
+          if (!pngBlob) {
+            console.error('SVG export: toBlob returned null');
+            reject(new Error('Conversia canvas → PNG a eșuat.'));
+            return;
+          }
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(pngBlob);
+          a.download = filename;
+          a.click();
+          URL.revokeObjectURL(a.href);
+          resolve();
+        }, 'image/png');
+      } catch (err) {
+        URL.revokeObjectURL(url);
+        reject(err);
+      }
+    };
+
+    img.src = url;
+  });
 }
