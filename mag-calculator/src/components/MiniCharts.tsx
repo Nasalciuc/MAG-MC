@@ -1,4 +1,5 @@
 import { useMAGStore } from '../store/useMAGStore';
+import { t } from '../i18n';
 
 function PieChart({ crit, total }: { crit: number; total: number }) {
   const pct = total > 0 ? crit / total : 0;
@@ -49,6 +50,8 @@ function SparkLine({ values }: { values: number[] }) {
 
 export function MiniCharts() {
   const result = useMAGStore(s => s.result);
+  const lang = useMAGStore(s => s.lang);
+  const tr = t(lang);
   if (!result) return null;
 
   const { summary, orderResults, activityData } = result;
@@ -62,15 +65,15 @@ export function MiniCharts() {
     <div className="flex flex-wrap gap-4 mb-4 items-center">
       <div className="flex items-center gap-2 p-2 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
         <PieChart crit={summary.critCount} total={result.sectors.length * 4} />
-        <span className="text-xs" style={{ color: 'var(--text2)' }}>Critice</span>
+        <span className="text-xs" style={{ color: 'var(--text2)' }}>{tr.miniCharts?.critical ?? 'Critice'}</span>
       </div>
       <div className="flex items-center gap-2 p-2 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
         <BarChart values={procTotals} labels={procs} />
-        <span className="text-xs" style={{ color: 'var(--text2)' }}>Durate/P</span>
+        <span className="text-xs" style={{ color: 'var(--text2)' }}>{tr.miniCharts?.durationsPerProc ?? 'Durate/P'}</span>
       </div>
       <div className="flex items-center gap-2 p-2 rounded-lg" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
         <SparkLine values={orderTs} />
-        <span className="text-xs" style={{ color: 'var(--text2)' }}>Ordini T</span>
+        <span className="text-xs" style={{ color: 'var(--text2)' }}>{tr.miniCharts?.ordersT ?? 'Ordini T'}</span>
       </div>
     </div>
   );

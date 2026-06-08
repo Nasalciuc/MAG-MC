@@ -22,7 +22,7 @@ export function resolveCSVarsInSVG(svgEl: SVGSVGElement): SVGSVGElement {
       }
     });
     if (htmlEl.style) {
-      ['fill', 'stroke', 'color', 'backgroundColor', 'borderColor'].forEach(prop => {
+      ['fill', 'stroke', 'color', 'background-color', 'border-color'].forEach(prop => {
         const val = htmlEl.style.getPropertyValue(prop);
         if (val && val.includes('var(')) {
           htmlEl.style.setProperty(prop, resolveValue(val));
@@ -78,7 +78,10 @@ export async function exportSVGAsPNG(svgEl: SVGSVGElement, filename: string): Pr
           a.href = URL.createObjectURL(pngBlob);
           a.download = filename;
           a.click();
-          URL.revokeObjectURL(a.href);
+          // Delay revoke to let browser start the download
+          setTimeout(() => {
+            URL.revokeObjectURL(a.href);
+          }, 100);
           resolve();
         }, 'image/png');
       } catch (err) {

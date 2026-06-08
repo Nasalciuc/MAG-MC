@@ -2,6 +2,7 @@ import type { DurationsMap, SolverStep } from './types';
 import { calcMAG } from './cpm-engine';
 
 export function generateSteps(order: string[], durate: DurationsMap, rata: number, nrMunc: number): SolverStep[] {
+  // TODO: i18n — explanations hardcoded in Romanian, move to i18n in Sprint 4
   const sectors = order;
   const procs = ['P1', 'P2', 'P3', 'P4'];
   const steps: SolverStep[] = [];

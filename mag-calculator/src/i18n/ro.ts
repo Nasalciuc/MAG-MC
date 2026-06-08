@@ -123,6 +123,7 @@ export const ro: Translations = {
     qReserve: 'Cât e rezerva totală R pentru',
     complete: 'Quiz complet!',
   },
+  miniCharts: { critical: 'Critice', durationsPerProc: 'Durate/P', ordersT: 'Ordini T' },
   poster: { generate: '📐 Poster A3', title: 'MAG Calculator — Poster' },
   sounds: { toggle: '🔊 Sunet' },
   exportPng: '📸 Export PNG',

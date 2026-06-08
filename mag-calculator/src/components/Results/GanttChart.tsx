@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { t } from '../../i18n';
 import { GANTT_COLORS } from '../../lib/constants';
@@ -14,6 +14,13 @@ export function GanttChart() {
   const tr = t(lang);
   const svgRef = useRef<SVGSVGElement>(null);
   const [dragPreview, setDragPreview] = useState<{ id: string; duration: number } | null>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (cleanupRef.current) cleanupRef.current();
+    };
+  }, []);
 
   const barH = 26, barGap = 4, labelW = 68, headerH = 28, padding = 36;
   const chartW = 700;
@@ -33,6 +40,7 @@ export function GanttChart() {
     const onUp = (me: MouseEvent) => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
+      cleanupRef.current = null;
       const dx = me.clientX - startX;
       const daysDelta = Math.round(dx / pxPerDay);
       const newDur = Math.max(1, origDuration + daysDelta);
@@ -40,6 +48,12 @@ export function GanttChart() {
         setDuration(act.id, newDur);
         calculate();
       }
+      setDragPreview(null);
+    };
+
+    cleanupRef.current = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
       setDragPreview(null);
     };
 
