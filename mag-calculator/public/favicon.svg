@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="8" fill="#3b82f6"/>
+  <text x="16" y="13" text-anchor="middle" fill="white" font-size="7" font-weight="bold" font-family="sans-serif">MAG</text>
+  <text x="16" y="23" text-anchor="middle" fill="#93c5fd" font-size="5.5" font-family="sans-serif">CPM</text>
+</svg>

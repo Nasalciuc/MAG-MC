@@ -1,0 +1,26 @@
+import type { Translations } from './ro';
+
+export const en: Translations = {
+  title: 'MAG Calculator',
+  subtitle: 'Matrix + Network Graph (CPM). Enter durations, automatically get all MAG parameters, critical path and budget.',
+  badge: 'UTM · Construction Management',
+  inputTitle: 'Input Data — Duration Matrix (days)',
+  preset: 'Preset', sectorCount: 'Sector count',
+  costRate: 'Cost rate', workers: 'Workers / team',
+  productivity: 'Productivity (lei/worker/shift)',
+  calculate: '⚡ Calculate MAG',
+  tabs: { mag: 'MAG Grid', gantt: 'Gantt Chart', network: 'Network Graph', ordine: 'All Orders', tabel: 'Parameter Table' },
+  summary: { optDuration: 'Optimal duration (Matrix)', magDuration: 'MAG duration', totalBudget: 'Total project budget', optOrders: 'Optimal orders', critActs: 'Critical activities' },
+  table: { activity: 'Activity', start: 't (start)', duration: 'ti (duration)', finish: 'tt (finish)', freeSlack: 'r (free slack)', totalSlack: 'R (total slack)', lateFinish: 'tm (late finish)', budget: 'B (k lei)', workers: 'N', critical: 'Critical' },
+  days: 'days', from: 'of', permutations: 'permutations', activities: 'activities',
+  share: '📋 Copy link', exportPdf: '📄 Export PDF', saveJson: '💾 Save JSON', loadJson: '📂 Load JSON',
+  light: '☀️ Light', dark: '🌙 Dark',
+  criticalPath: 'Critical path',
+  totalBudgetLabel: 'TOTAL BUDGET',
+  optimal: '✓ OPTIMAL', worst: 'Worst', suboptimal: 'Suboptimal',
+  goldenRule: 'Golden Rule',
+  goldenRuleText: 'P2 and P3 start only after P1 on the same sector. P4 starts only after both P2 and P3.',
+  costHint: 'k lei / day / process', workersHint: 'persons', productivityHint: 'lei / worker / shift',
+  customPreset: 'Custom values', copySuccess: '✅ Link copied!', copyError: '❌ Error',
+  legend: { blue: 'Blue row: t · ti · tt (start · duration · finish)', gray: 'Middle row: code · B (budget) · N (workers)', cream: 'Cream row: r · R · tm (free · total slack · late finish)', critical: 'Critical node (R = 0)' },
+};

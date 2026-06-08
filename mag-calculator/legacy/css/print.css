@@ -1,0 +1,41 @@
+/* Print stylesheet */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 10pt;
+  }
+
+  body::before { display: none !important; }
+
+  .container { max-width: 100%; padding: 0; }
+
+  header .badge,
+  .btn-calculate,
+  .btn-small,
+  .tabs,
+  .cost-info-box,
+  .legend,
+  #themeToggle, #shareBtn, #exportPdfBtn, #exportJsonBtn, #importJsonBtn,
+  #presetSelect, #sectorCount,
+  select, button {
+    display: none !important;
+  }
+
+  .panel, .stat-card, .mag-node, .full-table {
+    border: 1px solid #ccc !important;
+    background: white !important;
+  }
+
+  .stat-card .stat-value { color: black !important; }
+  .mag-cell.critical-val { color: red !important; }
+  .mag-cell.budget { color: green !important; }
+  .mag-cell.r-val { color: #b45309 !important; }
+
+  .tab-content { display: block !important; page-break-inside: avoid; margin-bottom: 1rem; }
+
+  .mag-node { break-inside: avoid; }
+  .full-table-wrap { break-inside: avoid; }
+
+  a[href]::after { content: none; }
+}
