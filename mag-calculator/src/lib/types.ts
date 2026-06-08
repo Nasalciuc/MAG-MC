@@ -89,7 +89,7 @@ export interface Preset {
   productivitate: number;
 }
 
-export type TabName = 'mag' | 'gantt' | 'network' | 'ordine' | 'tabel';
+export type TabName = 'mag' | 'gantt' | 'network' | 'ordine' | 'tabel' | 'steps' | 'whatif' | 'quiz';
 export type Theme = 'dark' | 'light';
 export type Lang = 'ro' | 'en';
 
@@ -109,4 +109,29 @@ export interface NetworkEdge {
   from: string;
   to: string;
   type: 'continuity' | 'technology';
+}
+
+// ===== NIVEL 4 TYPES =====
+
+export interface SolverStep {
+  nodeId: string;
+  type: 'forward' | 'backward' | 'reserve' | 'critical';
+  values: Record<string, number>;
+  explanation: string;
+}
+
+export interface HistoryEntry {
+  durations: DurationsMap;
+  params: CalcParams;
+  sectors: string[];
+  timestamp: number;
+}
+
+export interface QuizQuestion {
+  id: string;
+  type: 'critical-path' | 'optimal-t' | 'optimal-order' | 'reserve-value' | 'budget';
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
 }
