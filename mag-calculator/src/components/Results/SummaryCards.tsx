@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { t } from '../../i18n';
 import type { CalcSummary } from '../../lib/types';
+import { MiniCharts } from '../MiniCharts';
 
 interface StatCardProps {
   label: string;
@@ -68,6 +69,8 @@ export function SummaryCards() {
   }
 
   return (
+    <>
+    <MiniCharts />
     <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
       <StatCard label={tr.summary.optDuration} value={s.minT} unit={tr.days} />
       <StatCard label={`${tr.summary.magDuration} (${sectors.join('→')})`} value={s.firstMAGT} unit={tr.days} />
@@ -75,5 +78,6 @@ export function SummaryCards() {
       <StatCard label={tr.summary.optOrders} value={s.optimalCount} unit={`${tr.from} ${s.totalPerms} ${tr.permutations}`} />
       <StatCard label={tr.summary.critActs} value={s.critCount} unit={`${tr.from} ${sectors.length * 4} ${tr.activities}`} critical />
     </div>
+    </>
   );
 }

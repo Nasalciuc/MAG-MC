@@ -67,6 +67,7 @@ export const en: Translations = {
     qReserve: 'What is the total reserve R for',
     complete: 'Quiz complete!',
   },
+  miniCharts: { critical: 'Critical', durationsPerProc: 'Duration/P', ordersT: 'Orders T' },
   poster: { generate: '📐 A3 Poster', title: 'MAG Calculator — Poster' },
   sounds: { toggle: '🔊 Sound' },
   exportPng: '📸 Export PNG',

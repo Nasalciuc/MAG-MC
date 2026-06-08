@@ -6,6 +6,8 @@ import { GanttChart } from './GanttChart';
 import { NetworkDiagram } from './NetworkDiagram';
 import { OrdersTable } from './OrdersTable';
 import { ParameterTable } from './ParameterTable';
+import { StepByStep } from '../StepByStep/StepByStep';
+import { WhatIfComparator } from '../WhatIf/WhatIfComparator';
 
 export function TabNavigation() {
   const lang = useMAGStore(s => s.lang);
@@ -22,6 +24,8 @@ export function TabNavigation() {
     { id: 'network', label: tr.tabs.network },
     { id: 'ordine', label: tr.tabs.ordine },
     { id: 'tabel', label: tr.tabs.tabel },
+    { id: 'steps', label: tr.stepByStep.title },
+    { id: 'whatif', label: tr.whatIf.title },
   ];
 
   const handleKeyDown = (e: React.KeyboardEvent, idx: number) => {
@@ -29,9 +33,10 @@ export function TabNavigation() {
     if (e.key === 'ArrowLeft' && idx > 0) setActiveTab(tabs[idx - 1].id);
   };
 
+  const narrationKey = activeTab as keyof typeof tr.narration;
+
   return (
     <div>
-      {/* Tab bar */}
       <div
         id="onboarding-tabs"
         className="flex gap-1 mb-0 overflow-x-auto"
@@ -62,7 +67,6 @@ export function TabNavigation() {
         ))}
       </div>
 
-      {/* Tab content */}
       <div
         className="rounded-b-2xl rounded-tr-2xl p-4 sm:p-6 glass-panel"
         style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderTop: 'none' }}
@@ -74,11 +78,13 @@ export function TabNavigation() {
           {activeTab === 'network' && <NetworkDiagram />}
           {activeTab === 'ordine' && <OrdersTable />}
           {activeTab === 'tabel' && <ParameterTable />}
+          {activeTab === 'steps' && <StepByStep />}
+          {activeTab === 'whatif' && <WhatIfComparator />}
         </div>
 
-        {tr.narration[activeTab as keyof typeof tr.narration] && (
+        {tr.narration[narrationKey] && (
           <p className="text-sm italic mt-5 leading-relaxed" style={{ color: 'var(--text2)' }}>
-            💡 {tr.narration[activeTab as keyof typeof tr.narration]}
+            💡 {tr.narration[narrationKey]}
           </p>
         )}
       </div>

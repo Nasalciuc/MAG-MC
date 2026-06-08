@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMAGStore } from '../store/useMAGStore';
 import { t } from '../i18n';
 
@@ -16,6 +16,11 @@ export function Onboarding({ onComplete }: Props) {
   const lang = useMAGStore(s => s.lang);
   const tr = t(lang);
   const [step, setStep] = useState(0);
+  const nextBtnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    nextBtnRef.current?.focus();
+  }, [step]);
 
   const texts = [tr.onboarding.step1, tr.onboarding.step2, tr.onboarding.step3, tr.onboarding.step4, tr.onboarding.step5];
   const target = document.querySelector(STEP_TARGETS[step]);
@@ -31,7 +36,14 @@ export function Onboarding({ onComplete }: Props) {
     : { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: 300 };
 
   return (
-    <div className="fixed inset-0 z-[100]" style={{ pointerEvents: 'auto' }}>
+    <div
+      className="fixed inset-0 z-[100]"
+      style={{ pointerEvents: 'auto' }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Onboarding tour"
+      onKeyDown={(e) => { if (e.key === 'Escape') onComplete(); }}
+    >
       <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
       {rect && (
         <div
@@ -62,6 +74,7 @@ export function Onboarding({ onComplete }: Props) {
               {tr.onboarding.skip}
             </button>
             <button
+              ref={nextBtnRef}
               onClick={handleNext}
               className="text-xs px-3 py-1.5 rounded-lg font-semibold text-white"
               style={{ background: 'var(--accent)', border: 'none', cursor: 'pointer' }}
