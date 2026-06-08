@@ -104,7 +104,7 @@ export function ParametersPanel() {
             }
           }, 50);
         }}
-        className="w-full py-4 rounded-xl font-bold text-lg text-white mt-2 transition-transform hover:-translate-y-0.5 active:translate-y-0"
+        className="w-full py-4 rounded-xl font-bold text-lg text-white mt-2 transition-transform hover:-translate-y-0.5 active:translate-y-0 btn-shimmer"
         style={{ background: 'linear-gradient(135deg,#1d4ed8,#3b82f6)', border: 'none', cursor: 'pointer', boxShadow: '0 4px 20px rgba(59,130,246,0.3)', letterSpacing: '0.02em' }}
       >
         {tr.calculate}

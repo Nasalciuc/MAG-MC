@@ -63,7 +63,8 @@ export function TabNavigation() {
 
       {/* Tab content */}
       <div
-        className="rounded-b-2xl rounded-tr-2xl p-4 sm:p-6"
+        key={activeTab}
+        className="rounded-b-2xl rounded-tr-2xl p-4 sm:p-6 glass-panel tab-content-animated"
         style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderTop: 'none' }}
         role="tabpanel"
       >
@@ -72,6 +73,12 @@ export function TabNavigation() {
         {activeTab === 'network' && <NetworkDiagram />}
         {activeTab === 'ordine' && <OrdersTable />}
         {activeTab === 'tabel' && <ParameterTable />}
+
+        {tr.narration[activeTab as keyof typeof tr.narration] && (
+          <p className="text-sm italic mt-5 leading-relaxed" style={{ color: 'var(--text2)' }}>
+            💡 {tr.narration[activeTab as keyof typeof tr.narration]}
+          </p>
+        )}
       </div>
     </div>
   );

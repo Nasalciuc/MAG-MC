@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { t } from '../../i18n';
 import type { CalcSummary } from '../../lib/types';
@@ -29,14 +30,33 @@ function StatCard({ label, value, unit, critical }: StatCardProps) {
   );
 }
 
+function SkeletonCard() {
+  return <div className="skeleton-card" />;
+}
+
 export function SummaryCards() {
   const result = useMAGStore(s => s.result);
   const lang = useMAGStore(s => s.lang);
   const tr = t(lang);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+
+  useEffect(() => {
+    setShowSkeleton(true);
+    const timer = setTimeout(() => setShowSkeleton(false), 200);
+    return () => clearTimeout(timer);
+  }, [result]);
 
   if (!result) return null;
   const s: CalcSummary = result.summary;
   const sectors = result.sectors;
+
+  if (showSkeleton) {
+    return (
+      <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+        {Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)}
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>

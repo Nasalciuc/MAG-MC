@@ -33,7 +33,7 @@ export function InputPanel() {
 
   return (
     <div
-      className="rounded-2xl p-6 sm:p-8 mb-6"
+      className="rounded-2xl p-6 sm:p-8 mb-6 glass-panel"
       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       <div className="flex items-center gap-3 mb-6">
