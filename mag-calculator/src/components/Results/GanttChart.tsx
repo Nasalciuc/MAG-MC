@@ -1,9 +1,12 @@
+import { useRef } from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { GANTT_COLORS } from '../../lib/constants';
 import type { Activity } from '../../lib/types';
+import { ExportImageBtn } from '../ExportImage';
 
 export function GanttChart() {
   const result = useMAGStore(s => s.result);
+  const svgRef = useRef<SVGSVGElement>(null);
   if (!result) return null;
 
   const { activities, totalDuration, criticalPath } = result.activityData;
@@ -21,10 +24,9 @@ export function GanttChart() {
 
   return (
     <div style={{ overflowX: 'auto' }}>
-      <svg viewBox={`0 0 ${chartW} ${svgH}`} style={{ width: '100%', maxWidth: chartW, height: 'auto', borderRadius: 12 }}>
+      <svg ref={svgRef} viewBox={`0 0 ${chartW} ${svgH}`} style={{ width: '100%', maxWidth: chartW, height: 'auto', borderRadius: 12 }}>
         <rect width={chartW} height={svgH} fill="var(--surface)" rx={12} />
 
-        {/* Day labels + grid */}
         {gridLines.map(d => {
           const x = ox + d * pxPerDay;
           return (
@@ -39,7 +41,6 @@ export function GanttChart() {
 
         <text x={ox + (chartW - padding * 2 - labelW) / 2} y={padding - 6} textAnchor="middle" fill="var(--text2)" fontSize={10} fontFamily="Space Grotesk, sans-serif">Zile →</text>
 
-        {/* Legend */}
         {procs.map((p, i) => (
           <g key={p} transform={`translate(${chartW - padding - 180 + i * 44}, ${padding - 6})`}>
             <rect y={-10} width={12} height={12} rx={2} fill={GANTT_COLORS[p].fill} />
@@ -47,7 +48,6 @@ export function GanttChart() {
           </g>
         ))}
 
-        {/* Bars */}
         {activities.map((act: Activity, idx: number) => {
           const y = oy + idx * (barH + barGap);
           const x = ox + act.earlyStart * pxPerDay;
@@ -78,7 +78,6 @@ export function GanttChart() {
           );
         })}
 
-        {/* Critical path label */}
         <text
           x={padding}
           y={oy + numActs * (barH + barGap) + 18}
@@ -90,6 +89,7 @@ export function GanttChart() {
           ★ Drum critic: {criticalPath.join(' → ')}
         </text>
       </svg>
+      <ExportImageBtn svgRef={svgRef} filename="mag-gantt.png" />
     </div>
   );
 }

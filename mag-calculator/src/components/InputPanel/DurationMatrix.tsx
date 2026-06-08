@@ -46,6 +46,7 @@ export function DurationMatrix() {
 
   return (
     <div
+      id="onboarding-matrix"
       className="grid gap-2"
       style={{ gridTemplateColumns: `auto repeat(${sectors.length}, 1fr)` }}
     >

@@ -53,6 +53,7 @@ export function InputPanel() {
             {tr.preset}
           </label>
           <select
+            id="onboarding-preset"
             style={selectStyle}
             value={selectedPreset}
             onChange={e => loadPreset(e.target.value)}
