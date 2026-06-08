@@ -11,7 +11,7 @@ function ti(durate, p, s) {
 function getSuccesors(p, s, sectors) {
   const si = sectors.indexOf(s);
   const succs = [];
-  if (si < 2) succs.push({ proc: p, sec: sectors[si + 1] });
+  if (si < sectors.length - 1) succs.push({ proc: p, sec: sectors[si + 1] }); // generalizat N sectoare
   if (p === 'P1') {
     succs.push({ proc: 'P2', sec: s });
     succs.push({ proc: 'P3', sec: s });
@@ -22,7 +22,6 @@ function getSuccesors(p, s, sectors) {
 
 // Formula: start(Pi) = max k [ predEnds[k] - durată_proprie_cumulată_înainte_de_k ]
 function calcStart(proc, predEnds, sectors, durate) {
-  // formula: start = max over all sectors k of [ predEnds[k] - cumulative_own_before_k ]
   let maxVal = 0;
   let cumOwn = 0;
   sectors.forEach(s => {
@@ -34,13 +33,13 @@ function calcStart(proc, predEnds, sectors, durate) {
 }
 
 // Sectoare in ordinea data -> calculeaza MAG complet
-function calcMAG(order, durate, rata, nrMunc) {
-  // order = ['S1','S2','S3'] sau alta permutare
-  const sectors = order; // [sec1, sec2, sec3]
+// productivitate — parametru opțional (default 2000), backward-compatible
+function calcMAG(order, durate, rata, nrMunc, productivitate) {
+  productivitate = productivitate || 2000;
+  const sectors = order;
   const procs = ['P1','P2','P3','P4'];
-
-  // nodes: dict cu t, ti, tt, tm, r, R, B, N, isCritical
   const nodes = {};
+  const numSectors = sectors.length;
 
   // Calculam t (start) si tt (terminare) pentru fiecare nod
   // Reguli:
@@ -50,7 +49,7 @@ function calcMAG(order, durate, rata, nrMunc) {
   // P4: predecesor = max(tt P2, tt P3) pe acelasi sector; continuitate brigada = tt P4 pe sectorul anterior
 
   // P1
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < numSectors; i++) {
     const s = sectors[i];
     const key = `P1${s}`;
     let t;
@@ -64,12 +63,10 @@ function calcMAG(order, durate, rata, nrMunc) {
   }
 
   // P2
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < numSectors; i++) {
     const s = sectors[i];
     const key = `P2${s}`;
-    // constrangere tehnologica: dupa P1 pe acelasi sector
     const tech = nodes[`P1${s}`].tt;
-    // constrangere continuitate brigada: dupa P2 pe sectorul anterior
     const cont = i > 0 ? nodes[`P2${sectors[i-1]}`].tt : 0;
     const t = Math.max(tech, cont);
     const dur = ti(durate, 'P2', s);
@@ -77,7 +74,7 @@ function calcMAG(order, durate, rata, nrMunc) {
   }
 
   // P3
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < numSectors; i++) {
     const s = sectors[i];
     const key = `P3${s}`;
     const tech = nodes[`P1${s}`].tt;
@@ -88,7 +85,7 @@ function calcMAG(order, durate, rata, nrMunc) {
   }
 
   // P4
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < numSectors; i++) {
     const s = sectors[i];
     const key = `P4${s}`;
     const tech = Math.max(nodes[`P2${s}`].tt, nodes[`P3${s}`].tt);
@@ -98,8 +95,7 @@ function calcMAG(order, durate, rata, nrMunc) {
     nodes[key] = { t, ti: dur, tt: t + dur };
   }
 
-  // Durata totala
-  const T = nodes[`P4${sectors[2]}`].tt;
+  const T = nodes[`P4${sectors[numSectors - 1]}`].tt;
 
   // ===== MERS ÎNAPOI CPM CORECT =====
   // tm = termen maxim de TERMINARE
@@ -109,7 +105,6 @@ function calcMAG(order, durate, rata, nrMunc) {
 
   procs.forEach(p => sectors.forEach(s => { nodes[`${p}${s}`].tm = undefined; }));
 
-  // Parcurgere topologică inversă: P4→P3→P2→P1, sectoare invers
   const reverseTopo = [];
   ['P4', 'P3', 'P2', 'P1'].forEach(p => {
     for (let i = sectors.length - 1; i >= 0; i--) {
@@ -121,10 +116,8 @@ function calcMAG(order, durate, rata, nrMunc) {
     const key = `${p}${s}`;
     const succs = getSuccesors(p, s, sectors);
     if (succs.length === 0) {
-      // Nodul final P4 pe ultimul sector
       nodes[key].tm = T;
     } else {
-      // tm_curent = min( tm_succ - ti_succ ) pentru fiecare succesor
       nodes[key].tm = Math.min(...succs.map(suc => {
         const sn = nodes[`${suc.proc}${suc.sec}`];
         return sn.tm - sn.ti;
@@ -138,10 +131,7 @@ function calcMAG(order, durate, rata, nrMunc) {
     const n = nodes[key];
     const succs = getSuccesors(p, s, sectors);
 
-    // Rezerva totală R = tm - tt
     n.R = n.tm - n.tt;
-
-    // Rezerva liberă r = min(t_real_succesor) - tt
     if (succs.length === 0) {
       n.r = T - n.tt;
     } else {
@@ -149,7 +139,6 @@ function calcMAG(order, durate, rata, nrMunc) {
       n.r = minTSucc - n.tt;
     }
 
-    // Elimină erori numerice de virgulă mobilă
     n.R = Math.max(0, Number(n.R.toFixed(10)));
     n.r = Math.max(0, Number(n.r.toFixed(10)));
 
@@ -164,12 +153,12 @@ function calcMAG(order, durate, rata, nrMunc) {
 // Calculeaza Matrice (optimizare ordini) - metoda flux continuu brigazi
 function calcMatrice(order, durate) {
   const sectors = order;
+  const numSectors = sectors.length;
 
-  // Start P1 = 0, flux continuu
   const starts = {};
   const ends = {};
 
-  // P1
+  // P1 — cod redundant NEATINS (fix la Nivel 3)
   starts['P1'] = 0;
   let cum = 0;
   sectors.forEach(s => {
@@ -212,7 +201,7 @@ function calcMatrice(order, durate) {
     prevP4 = ends[`P4${s}`];
   });
 
-  const T = ends[`P4${sectors[2]}`];
+  const T = ends[`P4${sectors[numSectors - 1]}`];
   return T;
 }
 
@@ -228,4 +217,43 @@ function allPermutations(arr) {
 
 function formatCostValue(value) {
   return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, '');
+}
+
+/**
+ * Transformă output-ul calcMAG într-un array activities[] standardizat.
+ * Consumat de Gantt, PDF, și viitoarele componente React.
+ */
+function buildActivities(magResult) {
+  const { nodes, T, sectors } = magResult;
+  const procs = ['P1','P2','P3','P4'];
+  const activities = [];
+
+  procs.forEach(p => {
+    sectors.forEach(s => {
+      const key = `${p}${s}`;
+      const n = nodes[key];
+      activities.push({
+        id: key,
+        process: p,
+        sector: s,
+        duration: n.ti,
+        earlyStart: n.t,
+        earlyFinish: n.tt,
+        lateFinish: n.tm,
+        freeSlack: n.r,
+        totalSlack: n.R,
+        budget: n.B,
+        workers: n.N,
+        isCritical: n.isCritical
+      });
+    });
+  });
+
+  return {
+    activities,
+    totalDuration: T,
+    totalBudget: activities.reduce((sum, a) => sum + a.budget, 0),
+    criticalPath: activities.filter(a => a.isCritical).map(a => a.id),
+    sectorOrder: sectors
+  };
 }

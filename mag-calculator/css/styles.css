@@ -18,10 +18,33 @@
     --critical-bg: #1f0707;
   }
 
+  /* Light theme */
+  [data-theme="light"] {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface2: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text2: #64748b;
+    --bleu: #dbeafe;
+    --bleu-light: #3b82f6;
+    --crem: #fef3c7;
+    --crem-light: #d97706;
+    --critical-bg: #fef2f2;
+  }
+
+  [data-theme="light"] body::before {
+    opacity: 0.05;
+  }
+
+  [data-theme="light"] .btn-calculate {
+    box-shadow: 0 4px 20px rgba(59,130,246,0.15);
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -369,7 +392,7 @@
 
   .mag-grid-outer {
     display: grid;
-    grid-template-columns: 80px repeat(4, 1fr);
+    grid-template-columns: 80px repeat(4, minmax(100px, 1fr));
     gap: 8px;
     align-items: start;
   }
@@ -574,3 +597,56 @@
   }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
+
+  /* Small buttons (header actions) */
+  .btn-small {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text2);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-small:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  /* Gantt Chart */
+  .gantt-svg {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+
+  /* Stagger animation for MAG nodes */
+  @keyframes magNodeAppear {
+    from { opacity: 0; transform: translateY(8px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .mag-node {
+    animation: magNodeAppear 0.3s ease-out both;
+  }
+
+  .mag-grid-outer .mag-node:nth-child(2) { animation-delay: 0.05s; }
+  .mag-grid-outer .mag-node:nth-child(3) { animation-delay: 0.10s; }
+  .mag-grid-outer .mag-node:nth-child(4) { animation-delay: 0.15s; }
+  .mag-grid-outer .mag-node:nth-child(5) { animation-delay: 0.20s; }
+  .mag-grid-outer .mag-node:nth-child(6) { animation-delay: 0.05s; }
+  .mag-grid-outer .mag-node:nth-child(7) { animation-delay: 0.10s; }
+  .mag-grid-outer .mag-node:nth-child(8) { animation-delay: 0.15s; }
+  .mag-grid-outer .mag-node:nth-child(9) { animation-delay: 0.20s; }
+  .mag-grid-outer .mag-node:nth-child(10) { animation-delay: 0.10s; }
+  .mag-grid-outer .mag-node:nth-child(11) { animation-delay: 0.15s; }
+  .mag-grid-outer .mag-node:nth-child(12) { animation-delay: 0.20s; }
+  .mag-grid-outer .mag-node:nth-child(13) { animation-delay: 0.25s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mag-node { animation: none !important; }
+  }

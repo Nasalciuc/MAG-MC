@@ -103,19 +103,19 @@ function renderTabelParametri(result) {
 
   return `
     <div class="full-table-wrap">
-      <table class="full-table">
+      <table class="full-table" role="table">
         <thead>
           <tr>
-            <th>Activitate</th>
-            <th>t (start)</th>
-            <th>ti (durată)</th>
-            <th>tt (terminare)</th>
-            <th>r (rez. liberă)</th>
-            <th>R (rez. totală)</th>
-            <th>tm (term. max)</th>
-            <th>B (mii lei)</th>
-            <th>N</th>
-            <th>Critic</th>
+            <th scope="col">Activitate</th>
+            <th scope="col">${tooltipWrap('t', 't (start)')}</th>
+            <th scope="col">${tooltipWrap('ti', 'ti (durată)')}</th>
+            <th scope="col">${tooltipWrap('tt', 'tt (terminare)')}</th>
+            <th scope="col">${tooltipWrap('r', 'r (rez. liberă)')}</th>
+            <th scope="col">${tooltipWrap('R', 'R (rez. totală)')}</th>
+            <th scope="col">${tooltipWrap('tm', 'tm (term. max)')}</th>
+            <th scope="col">${tooltipWrap('B', 'B (mii lei)')}</th>
+            <th scope="col">${tooltipWrap('N', 'N')}</th>
+            <th scope="col">Critic</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -129,4 +129,37 @@ function renderTabelParametri(result) {
       </table>
     </div>
   `;
+}
+
+// ---------------------------------------------------------------------------
+// Spark bars — mini SVG bar-chart inline pentru vizualizare T
+// ---------------------------------------------------------------------------
+
+function renderSparkBar(T, minT, maxT) {
+  const range = maxT - minT || 1;
+  const fill = T === minT ? 'var(--green)' : (T === maxT ? 'var(--red)' : 'var(--yellow)');
+  return '<svg width="60" height="14" style="vertical-align:middle">' +
+    '<rect x="0" y="2" width="60" height="10" rx="3" fill="var(--surface2)" stroke="var(--border)" stroke-width="0.5"/>' +
+    '<rect x="0" y="2" width="' + Math.max(4, 60 * (T - minT + 1) / (maxT - minT + 1)) + '" height="10" rx="3" fill="' + fill + '" opacity="0.7"/>' +
+    '</svg>';
+}
+
+// ---------------------------------------------------------------------------
+// Tooltips educaționale
+// ---------------------------------------------------------------------------
+const PARAM_TOOLTIPS = {
+  t: 'Termenul minim de începere (Early Start) — cel mai devreme moment la care activitatea poate începe',
+  ti: 'Durata activității în zile',
+  tt: 'Termenul minim de terminare (Early Finish) = t + ti',
+  tm: 'Termenul maxim de terminare (Late Finish) — cel mai târziu moment fără a întârzia proiectul',
+  r: 'Rezerva liberă — cât poate întârzia fără a afecta succesorii direcți',
+  R: 'Rezerva totală — cât poate întârzia fără a afecta durata totală. R=0 → activitate critică!',
+  B: 'Bugetul activității = durata × rata costului (mii lei)',
+  N: 'Numărul de muncitori per brigadă'
+};
+
+function tooltipWrap(paramKey, displayText) {
+  const tip = PARAM_TOOLTIPS[paramKey];
+  if (!tip) return displayText;
+  return '<abbr title="' + tip + '" style="cursor:help; text-decoration:underline dotted var(--text2); text-underline-offset:2px">' + displayText + '</abbr>';
 }
