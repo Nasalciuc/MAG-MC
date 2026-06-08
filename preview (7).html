@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAG Calculator — Matrice + Grafic-Rețea</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #2a3a55;
+    --accent: #3b82f6;
+    --accent2: #60a5fa;
+    --red: #ef4444;
+    --green: #22c55e;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --bleu: #1e3a5f;
+    --bleu-light: #2563eb;
+    --crem: #2a1f0e;
+    --crem-light: #92400e;
+    --critical: #dc2626;
+    --critical-bg: #1f0707;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid effect */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 3rem 0 2rem;
+  }
+  header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #1e3a5f, #2563eb);
+    color: #93c5fd;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.35rem 1rem;
+    border-radius: 2rem;
+    border: 1px solid #3b82f6;
+    margin-bottom: 1.5rem;
+  }
+  header h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #60a5fa, #93c5fd, #dbeafe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  header p {
+    color: var(--text2);
+    font-size: 1.05rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Panels */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  .panel-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .panel-title .num {
+    background: var(--accent);
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* Input grid */
+  .input-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: auto repeat(3, 1fr);
+    gap: 8px;
+    align-items: center;
+  }
+  .matrix-grid .header-cell {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .matrix-grid .row-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent2);
+    white-space: nowrap;
+    padding-right: 0.5rem;
+  }
+  .matrix-grid input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.6rem 0.4rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .matrix-grid input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+  }
+
+  .params-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  .param-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .param-group input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.7rem 1rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .param-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+  }
+  .param-group .hint {
+    font-size: 0.75rem;
+    color: var(--text2);
+    margin-top: 0.3rem;
+  }
+
+
+  .cost-info-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    border-radius: 0 10px 10px 0;
+    padding: 1rem;
+    font-size: 0.82rem;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+  .cost-info-box strong {
+    color: var(--green);
+  }
+  .cost-info-box .cost-formula {
+    margin: 0.55rem 0;
+    padding: 0.65rem 0.8rem;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.22);
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+  }
+  .cost-info-box .calc-line {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--yellow);
+  }
+
+  /* Button */
+  .btn-calculate {
+    display: block;
+    width: 100%;
+    padding: 1.1rem;
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+    margin-top: 1.5rem;
+  }
+  .btn-calculate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(59,130,246,0.4);
+  }
+  .btn-calculate:active { transform: translateY(0); }
+
+  /* Results */
+  #results { display: none; }
+
+  .results-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    text-align: center;
+  }
+  .stat-card .stat-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .stat-card .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent2);
+    line-height: 1;
+  }
+  .stat-card .stat-unit {
+    font-size: 0.8rem;
+    color: var(--text2);
+    margin-top: 0.3rem;
+  }
+  .stat-card.critical-stat { border-color: var(--red); }
+  .stat-card.critical-stat .stat-value { color: var(--red); }
+
+  /* Section titles */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 2.5rem 0 1.2rem;
+  }
+  .section-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .section-header .tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 99px;
+  }
+
+  /* Orders table */
+  .orders-table-wrap { overflow-x: auto; }
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .orders-table th {
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .orders-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .orders-table tr:last-child td { border-bottom: none; }
+  .orders-table .opt-badge {
+    background: rgba(34,197,94,0.15);
+    color: var(--green);
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 99px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .orders-table tr.optimal-row { background: rgba(34,197,94,0.05); }
+  .orders-table tr.optimal-row td:nth-child(2) { color: var(--green); font-weight: 700; }
+
+  /* MAG Grid */
+  .mag-section { margin-bottom: 3rem; }
+  .mag-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .mag-grid-outer {
+    display: grid;
+    grid-template-columns: 80px repeat(4, 1fr);
+    gap: 8px;
+    align-items: start;
+  }
+  .mag-col-header {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.5rem;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .mag-row-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent2);
+    min-height: 110px;
+  }
+
+  /* MAG Node */
+  .mag-node {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface);
+    transition: transform 0.15s;
+    min-width: 120px;
+  }
+  .mag-node:hover { transform: scale(1.02); }
+  .mag-node.critical {
+    border-color: var(--critical) !important;
+    box-shadow: 0 0 12px rgba(220,38,38,0.3);
+  }
+
+  .mag-row-top {
+    background: var(--bleu);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .mag-row-mid {
+    background: var(--surface2);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .mag-row-bot {
+    background: var(--crem);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .mag-cell {
+    padding: 0.4rem 0.3rem;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-right: 1px solid var(--border);
+    line-height: 1.3;
+  }
+  .mag-cell:last-child { border-right: none; }
+  .mag-cell.label {
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: var(--text2);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .mag-cell.cod {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.05em;
+  }
+  .mag-cell.critical-val { color: var(--red); font-weight: 800; }
+  .mag-cell.r-val { color: var(--yellow); }
+  .mag-cell.budget { color: var(--green); }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin: 1rem 0 2rem;
+    padding: 1rem 1.5rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text2);
+  }
+  .legend-box {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    border: 2px solid transparent;
+  }
+
+  /* Critical path */
+  .critical-path-info {
+    background: var(--critical-bg);
+    border: 1px solid rgba(220,38,38,0.4);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+  .critical-path-info strong { color: var(--red); }
+
+  /* Full table */
+  .full-table-wrap { overflow-x: auto; margin-top: 1rem; }
+  .full-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .full-table th {
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .full-table td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  .full-table tr.critical-row { background: rgba(220,38,38,0.07); }
+  .full-table tr.critical-row td { color: var(--text); }
+  .full-table tr.critical-row td.crit-mark { color: var(--red); font-weight: 700; }
+  .full-table tfoot td {
+    background: var(--surface2);
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .input-section { grid-template-columns: 1fr; }
+    .mag-grid-outer { grid-template-columns: 60px repeat(4, 1fr); gap: 5px; }
+    .mag-cell { font-size: 0.72rem; padding: 0.3rem 0.2rem; }
+  }
+
+  .formula-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--yellow);
+    border-radius: 0 8px 8px 0;
+    padding: 0.8rem 1.2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--text2);
+    margin: 0.5rem 0 1rem;
+    line-height: 1.8;
+  }
+  .formula-box span { color: var(--yellow); }
+
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+  .tab {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px 8px 0 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text2);
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: all 0.2s;
+    position: relative;
+    bottom: -1px;
+  }
+  .tab.active {
+    color: var(--accent2);
+    background: var(--surface2);
+    border-color: var(--border);
+    border-bottom-color: var(--surface2);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="badge">UTM · Management în Construcții</div>
+    <h1>MAG Calculator</h1>
+    <p>Matrice + Grafic-Rețea (CPM). Introduci duratele, obții automat toți parametrii MAG, drumul critic și bugetul.</p>
+  </header>
+
+  <!-- INPUT PANEL -->
+  <div class="panel">
+    <div class="panel-title">
+      <span class="num">1</span>
+      Date de intrare — Matricea duratelor (zile)
+    </div>
+
+    <div class="input-section">
+      <div>
+        <div class="matrix-grid">
+          <div></div>
+          <div class="header-cell">S1</div>
+          <div class="header-cell">S2</div>
+          <div class="header-cell">S3</div>
+
+          <div class="row-label">P1 (conducător)</div>
+          <input type="number" id="d_P1S1" value="2" min="1" max="99">
+          <input type="number" id="d_P1S2" value="3" min="1" max="99">
+          <input type="number" id="d_P1S3" value="8" min="1" max="99">
+
+          <div class="row-label">P2 (‖ P3, după P1)</div>
+          <input type="number" id="d_P2S1" value="4" min="1" max="99">
+          <input type="number" id="d_P2S2" value="3" min="1" max="99">
+          <input type="number" id="d_P2S3" value="3" min="1" max="99">
+
+          <div class="row-label">P3 (‖ P2, după P1)</div>
+          <input type="number" id="d_P3S1" value="1" min="1" max="99">
+          <input type="number" id="d_P3S2" value="2" min="1" max="99">
+          <input type="number" id="d_P3S3" value="3" min="1" max="99">
+
+          <div class="row-label">P4 (după P2 ȘI P3)</div>
+          <input type="number" id="d_P4S1" value="2" min="1" max="99">
+          <input type="number" id="d_P4S2" value="1" min="1" max="99">
+          <input type="number" id="d_P4S3" value="1" min="1" max="99">
+        </div>
+      </div>
+
+      <div class="params-grid">
+        <div class="param-group">
+          <label>Rata costului</label>
+          <input type="number" id="rata" value="30" min="1" max="9999">
+          <div class="hint">mii lei / zi / proces</div>
+        </div>
+        <div class="param-group">
+          <label>Nr. muncitori / brigadă</label>
+          <input type="number" id="nrMunc" value="15" min="1" max="999">
+          <div class="hint">persoane</div>
+        </div>
+
+        <div class="cost-info-box">
+          <strong>💰 Cum se obține rata costului?</strong><br>
+          Rata costului reprezintă costul unei brigăzi pentru executarea unui proces timp de o zi.
+          <div class="cost-formula">
+            Rata costului = Nr. muncitori / brigadă × Productivitatea muncii / 1000
+          </div>
+          Pentru Anexa 2b:
+          <div class="calc-line" id="costCalcText">15 × 2000 / 1000 = 30 mii lei/zi/proces</div>
+          Productivitatea utilizată: <strong>2000 lei/muncitor/schimb</strong>. Împărțirea la 1000 se face deoarece în aplicație costul este exprimat în <strong>mii lei</strong>.
+        </div>
+
+        <div style="margin-top:0.5rem; padding: 1rem; background: var(--surface2); border-radius: 10px; border: 1px solid var(--border); font-size: 0.82rem; color: var(--text2); line-height: 1.7;">
+          <strong style="color: var(--accent2);">Regula de aur:</strong><br>
+          P2 și P3 pornesc numai după P1 pe acel sector.<br>
+          P4 pornește numai după ambele P2 <em>și</em> P3.<br>
+          <span style="color: var(--yellow);">Ordinea S1→S2→S3 este fixă în MAG (toate 3 ordini de bază).</span>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">⚡ Calculează MAG complet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- Summary cards -->
+    <div class="results-summary" id="summaryCards"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('mag')">Grila MAG</div>
+      <div class="tab" onclick="switchTab('ordine')">Toate cele 6 Ordini</div>
+      <div class="tab" onclick="switchTab('tabel')">Tabel Parametri</div>
+    </div>
+
+    <!-- TAB: MAG grids -->
+    <div class="tab-content active" id="tab-mag">
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-box" style="background: #1e3a5f; border-color: #2563eb;"></div>
+          Rând albastru: t · ti · tt (start · durată · terminare)
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: #1a2235; border-color: #2a3a55;"></div>
+          Rând mijloc: cod · B (buget) · N (muncitori)
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: #2a1f0e; border-color: #92400e;"></div>
+          Rând crem: r · R · tm (rez. liberă · rez. totală · term. max)
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="border-color: var(--red); background: rgba(220,38,38,0.1);"></div>
+          Nod critic (R = 0)
+        </div>
+      </div>
+      <div id="magGrids"></div>
+    </div>
+
+    <!-- TAB: ordini -->
+    <div class="tab-content" id="tab-ordine">
+      <div id="ordersContent"></div>
+    </div>
+
+    <!-- TAB: tabel parametri -->
+    <div class="tab-content" id="tab-tabel">
+      <div id="tabelContent"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ===== CORE MAG ALGORITHM =====
+
+function getDurate() {
+  const d = {};
+  const erori = [];
+
+  ['P1','P2','P3','P4'].forEach(p => {
+    ['S1','S2','S3'].forEach(s => {
+      const input = document.getElementById(`d_${p}${s}`);
+      const raw = input.value.trim();
+      const val = Number(raw);
+
+      // Duratele trebuie să fie completate, întregi și >= 1.
+      // Nu folosim parseInt, deoarece parseInt("2.5") ar transforma greșit valoarea în 2.
+      if (raw === '' || !Number.isInteger(val) || val < 1) {
+        erori.push(`${p} / ${s}`);
+        input.style.borderColor = 'var(--red)';
+        d[`${p}${s}`] = NaN;
+      } else {
+        input.style.borderColor = 'var(--border)';
+        d[`${p}${s}`] = val;
+      }
+    });
+  });
+
+  if (erori.length > 0) {
+    alert(`⚠️ Completează toate duratele cu valori întregi ≥ 1.
+Lipsesc sau sunt incorecte: ${erori.join(', ')}`);
+    return null;
+  }
+
+  return d;
+}
+
+function getParams() {
+  const rataInput = document.getElementById('rata');
+  const nrMuncInput = document.getElementById('nrMunc');
+
+  const rataRaw = rataInput.value.trim();
+  const nrMuncRaw = nrMuncInput.value.trim();
+
+  const rata = Number(rataRaw);
+  const nrMunc = Number(nrMuncRaw);
+
+  const erori = [];
+
+  if (rataRaw === '' || !Number.isFinite(rata) || rata <= 0) {
+    erori.push('rata costului');
+    rataInput.style.borderColor = 'var(--red)';
+  } else {
+    rataInput.style.borderColor = 'var(--border)';
+  }
+
+  if (nrMuncRaw === '' || !Number.isInteger(nrMunc) || nrMunc < 1) {
+    erori.push('numărul de muncitori');
+    nrMuncInput.style.borderColor = 'var(--red)';
+  } else {
+    nrMuncInput.style.borderColor = 'var(--border)';
+  }
+
+  if (erori.length > 0) {
+    alert(`⚠️ Completează corect: ${erori.join(', ')}.`);
+    return null;
+  }
+
+  return { rata, nrMunc };
+}
+
+// Sectoare in ordinea data -> calculeaza MAG complet
+function calcMAG(order, durate, rata, nrMunc) {
+  // order = ['S1','S2','S3'] sau alta permutare
+  const sectors = order; // [sec1, sec2, sec3]
+  const procs = ['P1','P2','P3','P4'];
+
+  // nodes: dict cu t, ti, tt, tm, r, R, B, N, isCritical
+  const nodes = {};
+
+  // Calculam t (start) si tt (terminare) pentru fiecare nod
+  // Reguli:
+  // P1: porneste la 0 pe primul sector, continuu pe celelalte
+  // P2: predecesor = P1 pe acelasi sector; continuitate brigada = tt P2 pe sectorul anterior
+  // P3: la fel cu P2
+  // P4: predecesor = max(tt P2, tt P3) pe acelasi sector; continuitate brigada = tt P4 pe sectorul anterior
+
+  function ti(p, s) { return durate[`${p}${s}`]; }
+
+  // P1
+  for (let i = 0; i < 3; i++) {
+    const s = sectors[i];
+    const key = `P1${s}`;
+    let t;
+    if (i === 0) {
+      t = 0;
+    } else {
+      t = nodes[`P1${sectors[i-1]}`].tt;
+    }
+    const dur = ti('P1', s);
+    nodes[key] = { t, ti: dur, tt: t + dur };
+  }
+
+  // P2
+  for (let i = 0; i < 3; i++) {
+    const s = sectors[i];
+    const key = `P2${s}`;
+    // constrangere tehnologica: dupa P1 pe acelasi sector
+    const tech = nodes[`P1${s}`].tt;
+    // constrangere continuitate brigada: dupa P2 pe sectorul anterior
+    const cont = i > 0 ? nodes[`P2${sectors[i-1]}`].tt : 0;
+    const t = Math.max(tech, cont);
+    const dur = ti('P2', s);
+    nodes[key] = { t, ti: dur, tt: t + dur };
+  }
+
+  // P3
+  for (let i = 0; i < 3; i++) {
+    const s = sectors[i];
+    const key = `P3${s}`;
+    const tech = nodes[`P1${s}`].tt;
+    const cont = i > 0 ? nodes[`P3${sectors[i-1]}`].tt : 0;
+    const t = Math.max(tech, cont);
+    const dur = ti('P3', s);
+    nodes[key] = { t, ti: dur, tt: t + dur };
+  }
+
+  // P4
+  for (let i = 0; i < 3; i++) {
+    const s = sectors[i];
+    const key = `P4${s}`;
+    const tech = Math.max(nodes[`P2${s}`].tt, nodes[`P3${s}`].tt);
+    const cont = i > 0 ? nodes[`P4${sectors[i-1]}`].tt : 0;
+    const t = Math.max(tech, cont);
+    const dur = ti('P4', s);
+    nodes[key] = { t, ti: dur, tt: t + dur };
+  }
+
+  // Durata totala
+  const T = nodes[`P4${sectors[2]}`].tt;
+
+  // ===== SUCCESORII unui nod PiSj =====
+  // 1) Continuitate brigadă: același proces pe sectorul următor
+  // 2) Succesori tehnologici pe același sector: P1→P2,P3 ; P2,P3→P4
+  function getSuccesors(p, s) {
+    const si = sectors.indexOf(s);
+    const succs = [];
+    if (si < 2) succs.push({ proc: p, sec: sectors[si + 1] });
+    if (p === 'P1') {
+      succs.push({ proc: 'P2', sec: s });
+      succs.push({ proc: 'P3', sec: s });
+    }
+    if (p === 'P2' || p === 'P3') succs.push({ proc: 'P4', sec: s });
+    return succs;
+  }
+
+  // ===== MERS ÎNAPOI CPM CORECT =====
+  // tm = termen maxim de TERMINARE
+  // Formula: tm(curent) = min peste succesori de [ tm(succ) - ti(succ) ]
+  // Adică: cel mai târziu moment la care activitatea curentă poate termina
+  // fără să întârzie startul maxim al niciunui succesor.
+
+  procs.forEach(p => sectors.forEach(s => { nodes[`${p}${s}`].tm = undefined; }));
+
+  // Parcurgere topologică inversă: P4→P3→P2→P1, sectoare invers
+  const reverseTopo = [];
+  ['P4', 'P3', 'P2', 'P1'].forEach(p => {
+    for (let i = sectors.length - 1; i >= 0; i--) {
+      reverseTopo.push({ p, s: sectors[i] });
+    }
+  });
+
+  reverseTopo.forEach(({ p, s }) => {
+    const key = `${p}${s}`;
+    const succs = getSuccesors(p, s);
+    if (succs.length === 0) {
+      // Nodul final P4 pe ultimul sector
+      nodes[key].tm = T;
+    } else {
+      // tm_curent = min( tm_succ - ti_succ ) pentru fiecare succesor
+      nodes[key].tm = Math.min(...succs.map(suc => {
+        const sn = nodes[`${suc.proc}${suc.sec}`];
+        return sn.tm - sn.ti;
+      }));
+    }
+  });
+
+  // ===== REZERVE, CRITIC, BUGET =====
+  procs.forEach(p => sectors.forEach(s => {
+    const key = `${p}${s}`;
+    const n = nodes[key];
+    const succs = getSuccesors(p, s);
+
+    // Rezerva totală R = tm - tt
+    n.R = n.tm - n.tt;
+
+    // Rezerva liberă r = min(t_real_succesor) - tt
+    if (succs.length === 0) {
+      n.r = T - n.tt;
+    } else {
+      const minTSucc = Math.min(...succs.map(suc => nodes[`${suc.proc}${suc.sec}`].t));
+      n.r = minTSucc - n.tt;
+    }
+
+    // Elimină erori numerice de virgulă mobilă
+    n.R = Math.max(0, Number(n.R.toFixed(10)));
+    n.r = Math.max(0, Number(n.r.toFixed(10)));
+
+    n.isCritical = (n.R === 0);
+    n.B = n.ti * rata;
+    n.N = nrMunc;
+  }));
+
+  return { nodes, T, sectors };
+}
+
+// Calculeaza Matrice (optimizare ordini) - metoda flux continuu brigazi
+function calcMatrice(order, durate) {
+  const sectors = order;
+  function ti(p, s) { return durate[`${p}${s}`]; }
+
+  // Start P1 = 0, flux continuu
+  const starts = {};
+  const ends = {};
+
+  // P1
+  starts['P1'] = 0;
+  let cum = 0;
+  sectors.forEach(s => {
+    ends[`P1${s}`] = (cum === 0 ? 0 : (cum > 0 ? cum : 0)) + ti('P1', s);
+    if (cum === 0) {
+      ends[`P1${s}`] = ti('P1', s);
+    } else {
+      ends[`P1${s}`] = ends[`P1${sectors[sectors.indexOf(s)-1]}`] + ti('P1', s);
+    }
+    cum += ti('P1', s);
+  });
+
+  // Helper: calculeaza start al unui proces cu predecesor dat
+  function calcStart(proc, predEnds) {
+    // formula: start = max over all sectors k of [ predEnds[k] - cumulative_own_before_k ]
+    let maxVal = 0;
+    let cumOwn = 0;
+    sectors.forEach(s => {
+      const val = predEnds[s] - cumOwn;
+      if (val > maxVal) maxVal = val;
+      cumOwn += ti(proc, s);
+    });
+    return maxVal;
+  }
+
+  // P2
+  const predP2 = {};
+  sectors.forEach(s => { predP2[s] = ends[`P1${s}`]; });
+  starts['P2'] = calcStart('P2', predP2);
+  let prevP2 = starts['P2'];
+  sectors.forEach(s => {
+    ends[`P2${s}`] = prevP2 + ti('P2', s);
+    prevP2 = ends[`P2${s}`];
+  });
+
+  // P3
+  const predP3 = {};
+  sectors.forEach(s => { predP3[s] = ends[`P1${s}`]; });
+  starts['P3'] = calcStart('P3', predP3);
+  let prevP3 = starts['P3'];
+  sectors.forEach(s => {
+    ends[`P3${s}`] = prevP3 + ti('P3', s);
+    prevP3 = ends[`P3${s}`];
+  });
+
+  // P4: predecesor = max(P2, P3) pe fiecare sector
+  const predP4 = {};
+  sectors.forEach(s => { predP4[s] = Math.max(ends[`P2${s}`], ends[`P3${s}`]); });
+  starts['P4'] = calcStart('P4', predP4);
+  let prevP4 = starts['P4'];
+  sectors.forEach(s => {
+    ends[`P4${s}`] = prevP4 + ti('P4', s);
+    prevP4 = ends[`P4${s}`];
+  });
+
+  const T = ends[`P4${sectors[2]}`];
+  return T;
+}
+
+function allPermutations(arr) {
+  if (arr.length <= 1) return [arr];
+  const result = [];
+  arr.forEach((el, i) => {
+    const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
+    allPermutations(rest).forEach(p => result.push([el, ...p]));
+  });
+  return result;
+}
+
+// ===== RENDER =====
+
+function renderMagNode(node, key) {
+  const isCrit = node.isCritical;
+  const critClass = isCrit ? ' critical' : '';
+
+  const topRow = `
+    <div class="mag-row-top">
+      <div class="mag-cell label">t</div>
+      <div class="mag-cell label">ti</div>
+      <div class="mag-cell label">tt</div>
+    </div>
+    <div class="mag-row-top" style="border-top:1px solid rgba(255,255,255,0.05)">
+      <div class="mag-cell${isCrit ? ' critical-val' : ''}">${node.t}</div>
+      <div class="mag-cell">${node.ti}</div>
+      <div class="mag-cell${isCrit ? ' critical-val' : ''}">${node.tt}</div>
+    </div>
+  `;
+
+  const midRow = `
+    <div class="mag-row-mid">
+      <div class="mag-cell cod">${key}</div>
+      <div class="mag-cell budget">${node.B}</div>
+      <div class="mag-cell">${node.N}</div>
+    </div>
+    <div class="mag-row-mid" style="border-top:1px solid rgba(255,255,255,0.05)">
+      <div class="mag-cell label">cod</div>
+      <div class="mag-cell label">B(mii lei)</div>
+      <div class="mag-cell label">N</div>
+    </div>
+  `;
+
+  const botRow = `
+    <div class="mag-row-bot">
+      <div class="mag-cell label">r</div>
+      <div class="mag-cell label">R</div>
+      <div class="mag-cell label">tm</div>
+    </div>
+    <div class="mag-row-bot" style="border-top:1px solid rgba(255,255,255,0.05)">
+      <div class="mag-cell r-val">${node.r}</div>
+      <div class="mag-cell${isCrit ? ' critical-val' : ' r-val'}">${node.R}</div>
+      <div class="mag-cell">${node.tm}</div>
+    </div>
+  `;
+
+  return `<div class="mag-node${critClass}">${topRow}${midRow}${botRow}</div>`;
+}
+
+function renderMAGGrid(result, label) {
+  const { nodes, T, sectors } = result;
+  const procs = ['P1','P2','P3','P4'];
+
+  const critPath = [];
+  procs.forEach(p => sectors.forEach(s => {
+    if (nodes[`${p}${s}`].isCritical) critPath.push(`${p}${s}`);
+  }));
+
+  const totalBuget = Object.values(nodes).reduce((a, n) => a + n.B, 0);
+
+  let html = `
+    <div class="mag-section">
+      <div class="mag-title">📊 MAG — Ordinea ${sectors.join(' → ')} &nbsp;|&nbsp; T = <strong>${T} zile</strong> &nbsp;|&nbsp; Buget total = <strong>${totalBuget} mii lei</strong></div>
+      <div class="critical-path-info">
+        <strong>Drum critic:</strong> ${critPath.join(' → ')}
+      </div>
+      <div class="mag-grid-outer">
+        <div></div>
+        ${procs.map(p => `<div class="mag-col-header">${p}</div>`).join('')}
+        ${sectors.map(s => `
+          <div class="mag-row-label">${s}</div>
+          ${procs.map(p => renderMagNode(nodes[`${p}${s}`], `${p}${s}`)).join('')}
+        `).join('')}
+      </div>
+    </div>
+  `;
+  return html;
+}
+
+function renderTabelParametri(result) {
+  const { nodes, T, sectors } = result;
+  const procs = ['P1','P2','P3','P4'];
+  let totalB = 0;
+
+  let rows = '';
+  procs.forEach(p => sectors.forEach(s => {
+    const n = nodes[`${p}${s}`];
+    totalB += n.B;
+    rows += `
+      <tr class="${n.isCritical ? 'critical-row' : ''}">
+        <td>${p}${s}</td>
+        <td>${n.t}</td>
+        <td>${n.ti}</td>
+        <td>${n.tt}</td>
+        <td class="r-val">${n.r}</td>
+        <td class="${n.isCritical ? 'critical-val' : ''}">${n.R}</td>
+        <td>${n.tm}</td>
+        <td style="color:var(--green)">${n.B}</td>
+        <td>${n.N}</td>
+        <td class="${n.isCritical ? 'crit-mark' : ''}">${n.isCritical ? 'DA ✓' : '—'}</td>
+      </tr>
+    `;
+  }));
+
+  return `
+    <div class="full-table-wrap">
+      <table class="full-table">
+        <thead>
+          <tr>
+            <th>Activitate</th>
+            <th>t (start)</th>
+            <th>ti (durată)</th>
+            <th>tt (terminare)</th>
+            <th>r (rez. liberă)</th>
+            <th>R (rez. totală)</th>
+            <th>tm (term. max)</th>
+            <th>B (mii lei)</th>
+            <th>N</th>
+            <th>Critic</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr>
+            <td colspan="7" style="text-align:right">TOTAL BUGET</td>
+            <td>${totalB}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  `;
+}
+
+function calculate() {
+  const durate = getDurate();
+  if (!durate) return;
+
+  const params = getParams();
+  if (!params) return;
+
+  const { rata, nrMunc } = params;
+
+  const sectors = ['S1','S2','S3'];
+  const perms = allPermutations(sectors);
+
+  // Calculeaza toate ordinile (Matrice)
+  const orderResults = perms.map(order => {
+    const T = calcMatrice(order, durate);
+    return { order, T };
+  });
+  orderResults.sort((a, b) => a.T - b.T);
+  const minT = orderResults[0].T;
+
+  // Calculeaza MAG pentru ordinile standard: S1-S2-S3, S2-S3-S1, S3-S1-S2
+  const magOrders = [
+    ['S1','S2','S3'],
+    ['S2','S3','S1'],
+    ['S3','S1','S2']
+  ];
+  const magResults = magOrders.map(order => calcMAG(order, durate, rata, nrMunc));
+
+  // Summary cards
+  const optimalOrders = orderResults.filter(r => r.T === minT);
+  const firstMAG = magResults[0];
+  const totalBuget = Object.values(firstMAG.nodes).reduce((a, n) => a + n.B, 0);
+  const critCount = Object.values(firstMAG.nodes).filter(n => n.isCritical).length;
+
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Durată optimă (Matrice)</div>
+      <div class="stat-value">${minT}</div>
+      <div class="stat-unit">zile</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Durată MAG (S1→S2→S3)</div>
+      <div class="stat-value">${firstMAG.T}</div>
+      <div class="stat-unit">zile</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Buget total proiect</div>
+      <div class="stat-value">${totalBuget}</div>
+      <div class="stat-unit">mii lei</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ordini optime (Matrice)</div>
+      <div class="stat-value">${optimalOrders.length}</div>
+      <div class="stat-unit">din 6 permutări</div>
+    </div>
+    <div class="stat-card critical-stat">
+      <div class="stat-label">Activități critice (MAG)</div>
+      <div class="stat-value">${critCount}</div>
+      <div class="stat-unit">din 12 activități</div>
+    </div>
+  `;
+
+  // MAG grids
+  document.getElementById('magGrids').innerHTML = magResults.map((r, i) =>
+    renderMAGGrid(r, magOrders[i].join('→'))
+  ).join('');
+
+  // Orders table
+  const maxT = Math.max(...orderResults.map(r => r.T));
+  document.getElementById('ordersContent').innerHTML = `
+    <div class="formula-box">
+      <span>start(Pi)</span> = max peste k : [ sfârşit_predecesor(k) − durată_proprie_cumulată_înainte_de_k ]<br>
+      P4 pe fiecare sector: predecesor = <span>max(sfârşit P2, sfârşit P3)</span> pe acel sector
+    </div>
+    <div class="orders-table-wrap">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>T (zile)</th>
+            <th>Ordinea sectoarelor</th>
+            <th>vs. optim</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${orderResults.map((r, i) => `
+            <tr class="${r.T === minT ? 'optimal-row' : ''}">
+              <td>${i+1}</td>
+              <td>${r.T}</td>
+              <td>${r.order.join(' → ')}</td>
+              <td>${r.T === minT ? '—' : `+${r.T - minT} zile`}</td>
+              <td>${r.T === minT ? '<span class="opt-badge">✓ OPTIM</span>' : (r.T === maxT ? '✗ Cel mai slab' : '~ Suboptim')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // Tabel parametri
+  document.getElementById('tabelContent').innerHTML = `
+    <h3 style="font-size:1rem; color:var(--accent2); margin-bottom:0.8rem;">Parametri MAG — Ordinea S1→S2→S3</h3>
+    ${renderTabelParametri(firstMAG)}
+    <h3 style="font-size:1rem; color:var(--accent2); margin: 1.5rem 0 0.8rem;">Parametri MAG — Ordinea S2→S3→S1</h3>
+    ${renderTabelParametri(magResults[1])}
+    <h3 style="font-size:1rem; color:var(--accent2); margin: 1.5rem 0 0.8rem;">Parametri MAG — Ordinea S3→S1→S2</h3>
+    ${renderTabelParametri(magResults[2])}
+  `;
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const names = ['mag','ordine','tabel'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+}
+
+
+function formatCostValue(value) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, '');
+}
+
+function updateCostInfo() {
+  const nrMuncInput = document.getElementById('nrMunc');
+  const costCalcText = document.getElementById('costCalcText');
+  if (!nrMuncInput || !costCalcText) return;
+
+  const productivitate = 2000; // lei / muncitor / schimb
+  const nrMunc = Number(nrMuncInput.value);
+
+  if (!Number.isFinite(nrMunc) || nrMunc <= 0) {
+    costCalcText.textContent = 'Completează numărul de muncitori pentru a calcula rata costului.';
+    return;
+  }
+
+  const rataCalculata = nrMunc * productivitate / 1000;
+  costCalcText.textContent = `${nrMunc} × ${productivitate} / 1000 = ${formatCostValue(rataCalculata)} mii lei/zi/proces`;
+}
+
+// Auto-calculeaza la incarcare cu valorile default (V11)
+window.addEventListener('load', () => {
+  updateCostInfo();
+  document.getElementById('nrMunc').addEventListener('input', updateCostInfo);
+  calculate();
+});
+</script>
+</body>
+</html>
