@@ -58,8 +58,15 @@ export const useMAGStore = create<MAGState>((set, get) => ({
   setDuration: (key, value) =>
     set(state => ({ durations: { ...state.durations, [key]: value } })),
 
-  setParam: (key, value) =>
-    set(state => ({ params: { ...state.params, [key]: value } })),
+  setParam: (key, value) => {
+    set(state => {
+      const newParams = { ...state.params, [key]: value };
+      if (key === 'nrMunc' || key === 'productivitate') {
+        newParams.rata = (newParams.nrMunc * newParams.productivitate) / 1000;
+      }
+      return { params: newParams };
+    });
+  },
 
   loadPreset: (key) => {
     const preset = MAG_PRESETS[key];
