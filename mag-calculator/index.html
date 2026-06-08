@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAG Calculator — Matrice + Grafic-Rețea</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="badge">UTM · Management în Construcții</div>
+    <h1>MAG Calculator</h1>
+    <p>Matrice + Grafic-Rețea (CPM). Introduci duratele, obții automat toți parametrii MAG, drumul critic și bugetul.</p>
+  </header>
+
+  <!-- INPUT PANEL -->
+  <div class="panel">
+    <div class="panel-title">
+      <span class="num">1</span>
+      Date de intrare — Matricea duratelor (zile)
+    </div>
+
+    <div class="input-section">
+      <div>
+        <div class="matrix-grid">
+          <div></div>
+          <div class="header-cell">S1</div>
+          <div class="header-cell">S2</div>
+          <div class="header-cell">S3</div>
+
+          <div class="row-label">P1 (conducător)</div>
+          <input type="number" id="d_P1S1" value="2" min="1" max="99">
+          <input type="number" id="d_P1S2" value="3" min="1" max="99">
+          <input type="number" id="d_P1S3" value="8" min="1" max="99">
+
+          <div class="row-label">P2 (‖ P3, după P1)</div>
+          <input type="number" id="d_P2S1" value="4" min="1" max="99">
+          <input type="number" id="d_P2S2" value="3" min="1" max="99">
+          <input type="number" id="d_P2S3" value="3" min="1" max="99">
+
+          <div class="row-label">P3 (‖ P2, după P1)</div>
+          <input type="number" id="d_P3S1" value="1" min="1" max="99">
+          <input type="number" id="d_P3S2" value="2" min="1" max="99">
+          <input type="number" id="d_P3S3" value="3" min="1" max="99">
+
+          <div class="row-label">P4 (după P2 ȘI P3)</div>
+          <input type="number" id="d_P4S1" value="2" min="1" max="99">
+          <input type="number" id="d_P4S2" value="1" min="1" max="99">
+          <input type="number" id="d_P4S3" value="1" min="1" max="99">
+        </div>
+      </div>
+
+      <div class="params-grid">
+        <div class="param-group">
+          <label>Rata costului</label>
+          <input type="number" id="rata" value="30" min="1" max="9999">
+          <div class="hint">mii lei / zi / proces</div>
+        </div>
+        <div class="param-group">
+          <label>Nr. muncitori / brigadă</label>
+          <input type="number" id="nrMunc" value="15" min="1" max="999">
+          <div class="hint">persoane</div>
+        </div>
+
+        <div class="cost-info-box">
+          <strong>💰 Cum se obține rata costului?</strong><br>
+          Rata costului reprezintă costul unei brigăzi pentru executarea unui proces timp de o zi.
+          <div class="cost-formula">
+            Rata costului = Nr. muncitori / brigadă × Productivitatea muncii / 1000
+          </div>
+          Pentru Anexa 2b:
+          <div class="calc-line" id="costCalcText">15 × 2000 / 1000 = 30 mii lei/zi/proces</div>
+          Productivitatea utilizată: <strong>2000 lei/muncitor/schimb</strong>. Împărțirea la 1000 se face deoarece în aplicație costul este exprimat în <strong>mii lei</strong>.
+        </div>
+
+        <div style="margin-top:0.5rem; padding: 1rem; background: var(--surface2); border-radius: 10px; border: 1px solid var(--border); font-size: 0.82rem; color: var(--text2); line-height: 1.7;">
+          <strong style="color: var(--accent2);">Regula de aur:</strong><br>
+          P2 și P3 pornesc numai după P1 pe acel sector.<br>
+          P4 pornește numai după ambele P2 <em>și</em> P3.<br>
+          <span style="color: var(--yellow);">Ordinea S1→S2→S3 este fixă în MAG (toate 3 ordini de bază).</span>
+        </div>
+
+        <button class="btn-calculate" onclick="calculate()">⚡ Calculează MAG complet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- Summary cards -->
+    <div class="results-summary" id="summaryCards"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('mag')">Grila MAG</div>
+      <div class="tab" onclick="switchTab('ordine')">Toate cele 6 Ordini</div>
+      <div class="tab" onclick="switchTab('tabel')">Tabel Parametri</div>
+    </div>
+
+    <!-- TAB: MAG grids -->
+    <div class="tab-content active" id="tab-mag">
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-box" style="background: #1e3a5f; border-color: #2563eb;"></div>
+          Rând albastru: t · ti · tt (start · durată · terminare)
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: #1a2235; border-color: #2a3a55;"></div>
+          Rând mijloc: cod · B (buget) · N (muncitori)
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: #2a1f0e; border-color: #92400e;"></div>
+          Rând crem: r · R · tm (rez. liberă · rez. totală · term. max)
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="border-color: var(--red); background: rgba(220,38,38,0.1);"></div>
+          Nod critic (R = 0)
+        </div>
+      </div>
+      <div id="magGrids"></div>
+    </div>
+
+    <!-- TAB: ordini -->
+    <div class="tab-content" id="tab-ordine">
+      <div id="ordersContent"></div>
+    </div>
+
+    <!-- TAB: tabel parametri -->
+    <div class="tab-content" id="tab-tabel">
+      <div id="tabelContent"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/mag-core.js"></script>
+<script src="js/mag-render.js"></script>
+<script src="js/mag-dom.js"></script>
+<script src="js/mag-app.js"></script>
+</body>
+</html>
