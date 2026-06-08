@@ -95,8 +95,14 @@ export function ParametersPanel() {
         onClick={() => {
           calculate();
           setTimeout(() => {
-            document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 100);
+            const el = document.getElementById('results-section');
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              el.classList.remove('results-flash');
+              void el.offsetWidth;
+              el.classList.add('results-flash');
+            }
+          }, 50);
         }}
         className="w-full py-4 rounded-xl font-bold text-lg text-white mt-2 transition-transform hover:-translate-y-0.5 active:translate-y-0"
         style={{ background: 'linear-gradient(135deg,#1d4ed8,#3b82f6)', border: 'none', cursor: 'pointer', boxShadow: '0 4px 20px rgba(59,130,246,0.3)', letterSpacing: '0.02em' }}

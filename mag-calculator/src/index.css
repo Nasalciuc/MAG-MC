@@ -57,3 +57,12 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   opacity: 0.5;
 }
+
+@keyframes resultsFlash {
+  0% { opacity: 0.6; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.results-flash {
+  animation: resultsFlash 0.3s ease-out;
+}
