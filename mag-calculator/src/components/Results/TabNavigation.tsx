@@ -33,6 +33,7 @@ export function TabNavigation() {
     <div>
       {/* Tab bar */}
       <div
+        id="onboarding-tabs"
         className="flex gap-1 mb-0 overflow-x-auto"
         role="tablist"
         style={{ borderBottom: '1px solid var(--border)', paddingBottom: 0 }}

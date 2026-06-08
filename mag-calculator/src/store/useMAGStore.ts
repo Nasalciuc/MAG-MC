@@ -3,6 +3,10 @@ import type { DurationsMap, CalcParams, CalculationResult, TabName, Theme, Lang 
 import { runCalculations } from '../lib/cpm-engine';
 import { MAG_PRESETS } from '../lib/presets';
 import { DEFAULT_SECTORS, MAG_STORAGE_KEY, MAG_VERSION } from '../lib/constants';
+import { createHistoryManager } from '../lib/history';
+
+const historyMgr = createHistoryManager();
+let skipHistory = false;
 
 interface MAGState {
   sectors: string[];
@@ -23,6 +27,8 @@ interface MAGState {
   toggleTheme: () => void;
   toggleLang: () => void;
   importState: (durations: DurationsMap, params: CalcParams, sectors: string[]) => void;
+  undo: () => void;
+  redo: () => void;
 }
 
 const getInitialTheme = (): Theme =>
@@ -30,6 +36,12 @@ const getInitialTheme = (): Theme =>
 
 const getInitialLang = (): Lang =>
   typeof window !== 'undefined' ? ((localStorage.getItem('mag-lang') as Lang) || 'ro') : 'ro';
+
+function pushHistory(get: () => MAGState) {
+  if (skipHistory) return;
+  const { durations, params, sectors } = get();
+  historyMgr.push(durations, params, sectors);
+}
 
 export const useMAGStore = create<MAGState>((set, get) => ({
   sectors: DEFAULT_SECTORS,
@@ -42,6 +54,7 @@ export const useMAGStore = create<MAGState>((set, get) => ({
   lang: getInitialLang(),
 
   setSectors: (sectors) => {
+    pushHistory(get);
     const { durations } = get();
     const procs = ['P1', 'P2', 'P3', 'P4'];
     const newDurations: DurationsMap = {};
@@ -55,10 +68,13 @@ export const useMAGStore = create<MAGState>((set, get) => ({
     setTimeout(() => get().calculate(), 0);
   },
 
-  setDuration: (key, value) =>
-    set(state => ({ durations: { ...state.durations, [key]: value } })),
+  setDuration: (key, value) => {
+    pushHistory(get);
+    set(state => ({ durations: { ...state.durations, [key]: value } }));
+  },
 
   setParam: (key, value) => {
+    pushHistory(get);
     set(state => {
       const newParams = { ...state.params, [key]: value };
       if (key === 'nrMunc' || key === 'productivitate') {
@@ -69,6 +85,7 @@ export const useMAGStore = create<MAGState>((set, get) => ({
   },
 
   loadPreset: (key) => {
+    pushHistory(get);
     const preset = MAG_PRESETS[key];
     if (!preset) return;
     set({
@@ -112,7 +129,26 @@ export const useMAGStore = create<MAGState>((set, get) => ({
   },
 
   importState: (durations, params, sectors) => {
+    pushHistory(get);
     set({ durations, params, sectors, selectedPreset: 'custom' });
     setTimeout(() => get().calculate(), 0);
+  },
+
+  undo: () => {
+    const entry = historyMgr.undo();
+    if (!entry) return;
+    skipHistory = true;
+    set({ durations: { ...entry.durations }, params: { ...entry.params }, sectors: [...entry.sectors], selectedPreset: 'custom' });
+    get().calculate();
+    skipHistory = false;
+  },
+
+  redo: () => {
+    const entry = historyMgr.redo();
+    if (!entry) return;
+    skipHistory = true;
+    set({ durations: { ...entry.durations }, params: { ...entry.params }, sectors: [...entry.sectors], selectedPreset: 'custom' });
+    get().calculate();
+    skipHistory = false;
   },
 }));

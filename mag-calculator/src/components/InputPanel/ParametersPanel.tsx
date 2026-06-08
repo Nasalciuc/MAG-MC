@@ -92,6 +92,7 @@ export function ParametersPanel() {
       </div>
 
       <button
+        id="onboarding-calculate"
         onClick={() => {
           calculate();
           setTimeout(() => {

@@ -1,14 +1,21 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMAGStore } from './store/useMAGStore';
 import { Header } from './components/Header';
 import { InputPanel } from './components/InputPanel/InputPanel';
 import { SummaryCards } from './components/Results/SummaryCards';
 import { TabNavigation } from './components/Results/TabNavigation';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { KeyboardShortcuts } from './components/KeyboardShortcuts';
+import { Onboarding } from './components/Onboarding';
 
 export default function App() {
   const theme = useMAGStore(s => s.theme);
   const result = useMAGStore(s => s.result);
   const calculate = useMAGStore(s => s.calculate);
+  const { showModal, setShowModal } = useKeyboardShortcuts();
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => typeof window !== 'undefined' && !localStorage.getItem('mag-onboarding-done')
+  );
 
   useEffect(() => {
     document.documentElement.className = theme === 'light' ? 'light' : '';
@@ -20,7 +27,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
-      {/* Grid background */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
@@ -40,6 +46,14 @@ export default function App() {
           </div>
         )}
       </div>
+
+      <KeyboardShortcuts open={showModal} onClose={() => setShowModal(false)} />
+      {showOnboarding && (
+        <Onboarding onComplete={() => {
+          localStorage.setItem('mag-onboarding-done', 'true');
+          setShowOnboarding(false);
+        }} />
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
+import { ExportImageBtn } from '../ExportImage';
 import { buildNetworkEdges } from '../../lib/cpm-engine';
 import type { NetworkEdge } from '../../lib/types';
 
@@ -53,6 +54,7 @@ function edgePath(edge: NetworkEdge, sectors: string[]): string {
 
 export function NetworkDiagram() {
   const result = useMAGStore(s => s.result);
+  const svgRef = useRef<SVGSVGElement>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
   if (!result) return null;
@@ -75,7 +77,7 @@ export function NetworkDiagram() {
 
   return (
     <div style={{ overflowX: 'auto' }}>
-      <svg viewBox={`0 0 ${svgW} ${svgH}`} style={{ width: '100%', maxWidth: svgW, height: 'auto', borderRadius: 12 }}>
+      <svg ref={svgRef} viewBox={`0 0 ${svgW} ${svgH}`} style={{ width: '100%', maxWidth: svgW, height: 'auto', borderRadius: 12 }}>
         <defs>
           <marker id="arrow-tech" markerWidth={8} markerHeight={8} refX={6} refY={3} orient="auto">
             <path d="M0,0 L0,6 L8,3 z" fill="var(--accent2)" />
@@ -153,7 +155,7 @@ export function NetworkDiagram() {
         }))}
       </svg>
 
-      {/* Legend */}
+      <ExportImageBtn svgRef={svgRef} filename="mag-network.png" />
       <div className="flex flex-wrap gap-4 mt-3 text-xs" style={{ color: 'var(--text2)' }}>
         <span><span style={{ display: 'inline-block', width: 20, height: 2, background: 'var(--green)', verticalAlign: 'middle', marginRight: 4 }} />Continuitate brigadă</span>
         <span><span style={{ display: 'inline-block', width: 20, height: 2, background: 'var(--accent2)', verticalAlign: 'middle', marginRight: 4 }} />Tehnologic (P1→P2/P3, P2/P3→P4)</span>
