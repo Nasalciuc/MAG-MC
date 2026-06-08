@@ -52,6 +52,7 @@ export const useMAGStore = create<MAGState>((set, get) => ({
       });
     });
     set({ sectors, durations: newDurations });
+    setTimeout(() => get().calculate(), 0);
   },
 
   setDuration: (key, value) =>

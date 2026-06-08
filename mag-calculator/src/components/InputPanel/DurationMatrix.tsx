@@ -1,3 +1,4 @@
+import React from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { PROCESS_LABELS } from '../../lib/constants';
 
@@ -23,8 +24,9 @@ export function DurationMatrix() {
   };
 
   const handleChange = (key: string, val: string) => {
+    if (val === '') return;
     const n = parseInt(val, 10);
-    if (!isNaN(n) && n >= 1) {
+    if (!isNaN(n) && n >= 1 && n <= 99) {
       setDuration(key, n);
       calculate();
     }
@@ -45,28 +47,29 @@ export function DurationMatrix() {
 
       {/* Data rows */}
       {procs.map(p => (
-        <>
-          <div key={`label-${p}`} className="text-sm font-semibold py-1 pr-2 flex items-center" style={{ color: 'var(--accent2)', whiteSpace: 'nowrap' }}>
+        <React.Fragment key={p}>
+          <div className="text-sm font-semibold py-1 pr-2 flex items-center" style={{ color: 'var(--accent2)', whiteSpace: 'nowrap' }}>
             {PROCESS_LABELS[p]}
           </div>
           {sectors.map(s => {
-            const key = `${p}${s}`;
+            const k = `${p}${s}`;
             return (
               <input
-                key={key}
+                key={k}
                 type="number"
-                id={`d_${key}`}
+                id={`d_${k}`}
                 min={1}
                 max={99}
-                value={durations[key] ?? ''}
-                onChange={e => handleChange(key, e.target.value)}
+                step={1}
+                value={durations[k] ?? ''}
+                onChange={e => handleChange(k, e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && calculate()}
                 aria-label={`Durata ${p} pe ${s}`}
                 style={inputStyle}
               />
             );
           })}
-        </>
+        </React.Fragment>
       ))}
     </div>
   );

@@ -25,10 +25,11 @@ export function ParametersPanel() {
   };
 
   const handleChange = <K extends keyof CalcParams>(key: K, val: string) => {
+    if (val === '') return;
     const n = parseFloat(val);
     if (!isNaN(n) && n > 0) {
       setParam(key, n as CalcParams[K]);
-      if (key !== 'productivitate') calculate();
+      calculate();
     }
   };
 
@@ -39,7 +40,7 @@ export function ParametersPanel() {
           {tr.costRate}
         </label>
         <input
-          type="number" min={1} max={9999}
+          type="number" min={1} max={9999} step={1}
           value={params.rata}
           onChange={e => handleChange('rata', e.target.value)}
           onKeyDown={e => e.key === 'Enter' && calculate()}
@@ -54,7 +55,7 @@ export function ParametersPanel() {
           {tr.workers}
         </label>
         <input
-          type="number" min={1} max={999}
+          type="number" min={1} max={999} step={1}
           value={params.nrMunc}
           onChange={e => handleChange('nrMunc', e.target.value)}
           onKeyDown={e => e.key === 'Enter' && calculate()}
@@ -69,7 +70,7 @@ export function ParametersPanel() {
           {tr.productivity}
         </label>
         <input
-          type="number" min={100} max={99999}
+          type="number" min={100} max={99999} step={1}
           value={params.productivitate}
           onChange={e => {
             handleChange('productivitate', e.target.value);
@@ -91,7 +92,12 @@ export function ParametersPanel() {
       </div>
 
       <button
-        onClick={calculate}
+        onClick={() => {
+          calculate();
+          setTimeout(() => {
+            document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }}
         className="w-full py-4 rounded-xl font-bold text-lg text-white mt-2 transition-transform hover:-translate-y-0.5 active:translate-y-0"
         style={{ background: 'linear-gradient(135deg,#1d4ed8,#3b82f6)', border: 'none', cursor: 'pointer', boxShadow: '0 4px 20px rgba(59,130,246,0.3)', letterSpacing: '0.02em' }}
       >

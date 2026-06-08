@@ -34,10 +34,10 @@ export default function App() {
         <Header />
         <InputPanel />
         {result && (
-          <>
+          <div id="results-section">
             <SummaryCards />
             <TabNavigation />
-          </>
+          </div>
         )}
       </div>
     </div>
