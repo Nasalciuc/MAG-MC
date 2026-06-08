@@ -61,6 +61,7 @@ export function GanttChart() {
                 {act.id}
               </text>
               <rect
+                className="gantt-bar-hover"
                 x={x} y={y} width={w} height={barH} rx={4}
                 fill={color.fill} fillOpacity={0.85}
                 stroke={isCrit ? 'var(--red)' : color.stroke}

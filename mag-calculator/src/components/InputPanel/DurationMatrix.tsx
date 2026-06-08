@@ -2,12 +2,24 @@ import React from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { PROCESS_LABELS } from '../../lib/constants';
 
+function heatmapBg(val: number, allVals: number[]): string {
+  if (allVals.length === 0) return 'var(--surface2)';
+  const min = Math.min(...allVals);
+  const max = Math.max(...allVals);
+  if (min === max) return 'var(--surface2)';
+  const ratio = (val - min) / (max - min);
+  const r = Math.round(34 + ratio * (239 - 34));
+  const g = Math.round(197 - ratio * (197 - 68));
+  return `rgba(${r}, ${g}, 94, 0.12)`;
+}
+
 export function DurationMatrix() {
   const sectors = useMAGStore(s => s.sectors);
   const durations = useMAGStore(s => s.durations);
   const setDuration = useMAGStore(s => s.setDuration);
   const calculate = useMAGStore(s => s.calculate);
   const procs = ['P1', 'P2', 'P3', 'P4'];
+  const allVals = Object.values(durations).filter(v => typeof v === 'number' && !isNaN(v));
 
   const inputStyle: React.CSSProperties = {
     background: 'var(--surface2)',
@@ -65,7 +77,7 @@ export function DurationMatrix() {
                 onChange={e => handleChange(k, e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && calculate()}
                 aria-label={`Durata ${p} pe ${s}`}
-                style={inputStyle}
+                style={{ ...inputStyle, background: heatmapBg(durations[k] ?? 0, allVals) }}
               />
             );
           })}

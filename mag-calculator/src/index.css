@@ -40,6 +40,42 @@ body {
   overflow-x: hidden;
 }
 
+/* Animated gradient background */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.03) 0%,
+    rgba(139, 92, 246, 0.03) 25%,
+    rgba(236, 72, 153, 0.02) 50%,
+    rgba(59, 130, 246, 0.03) 75%,
+    rgba(16, 185, 129, 0.02) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Glass morphism — desktop only */
+@media (min-width: 768px) and (hover: hover) {
+  .glass-panel {
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    background: rgba(17, 24, 39, 0.65) !important;
+  }
+  .light .glass-panel {
+    background: rgba(255, 255, 255, 0.7) !important;
+  }
+}
+
 @keyframes magNodeAppear {
   from { opacity: 0; transform: translateY(8px) scale(0.95); }
   to   { opacity: 1; transform: translateY(0)   scale(1); }
@@ -49,13 +85,74 @@ body {
   animation: magNodeAppear 0.3s ease-out both;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .mag-node-animate { animation: none !important; }
+/* Critical pulse animation */
+@keyframes criticalPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(220, 38, 38, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.6); }
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  opacity: 0.5;
+.critical-pulse {
+  animation: criticalPulse 2s ease-in-out infinite;
+}
+
+/* Hover scale for MAG nodes */
+.mag-node-hover:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  position: relative;
+}
+
+/* Gantt bar hover */
+.gantt-bar-hover:hover {
+  filter: brightness(1.2);
+  cursor: pointer;
+}
+
+/* Tab content slide animation */
+@keyframes tabSlideIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.tab-content-animated {
+  animation: tabSlideIn 0.25s ease-out;
+}
+
+/* Skeleton shimmer */
+@keyframes skeletonShimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton-card {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 37%, var(--surface2) 63%);
+  background-size: 200px 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+  border-radius: 12px;
+  height: 100px;
+}
+
+/* Button shimmer */
+@keyframes buttonShimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  animation: buttonShimmer 3s ease-in-out infinite;
 }
 
 @keyframes resultsFlash {
@@ -65,4 +162,20 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .results-flash {
   animation: resultsFlash 0.3s ease-out;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mag-node-animate { animation: none !important; }
+  .critical-pulse { animation: none !important; }
+  .mag-node-hover:hover { transform: none !important; }
+  body::after { animation: none !important; }
+  .tab-content-animated { animation: none !important; }
+  .skeleton-card { animation: none !important; }
+  .btn-shimmer::after { animation: none !important; display: none; }
+  .results-flash { animation: none !important; }
 }

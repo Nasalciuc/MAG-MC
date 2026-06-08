@@ -36,7 +36,7 @@ export function MAGNode({ node, nodeKey, animDelay = 0 }: Props) {
 
   return (
     <div
-      className="mag-node-animate rounded-xl overflow-hidden font-mono"
+      className={`mag-node-animate rounded-xl overflow-hidden font-mono mag-node-hover${isCrit ? ' critical-pulse' : ''}`}
       style={{
         border: `2px solid ${isCrit ? 'var(--critical)' : 'var(--border)'}`,
         boxShadow: isCrit ? '0 0 12px rgba(220,38,38,0.3)' : undefined,
