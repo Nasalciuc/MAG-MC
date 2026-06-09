@@ -94,7 +94,7 @@ export function ParametersPanel() {
       <button
         id="onboarding-calculate"
         onClick={() => {
-          calculate();
+          calculate(true);
           setTimeout(() => {
             const el = document.getElementById('results-section');
             if (el) {

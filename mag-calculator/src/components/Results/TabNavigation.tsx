@@ -11,6 +11,7 @@ import { StepByStep } from '../StepByStep/StepByStep';
 import { WhatIfComparator } from '../WhatIf/WhatIfComparator';
 import { WorkforceHistogram } from '../GFM/WorkforceHistogram';
 import { AOADiagram } from '../AOA/AOADiagram';
+import { QuizMode } from '../Quiz/QuizMode';
 
 export function TabNavigation() {
   const lang = useMAGStore(s => s.lang);
@@ -33,8 +34,9 @@ export function TabNavigation() {
     { id: 'tabel', label: tr.tabs.tabel },
     { id: 'steps', label: tr.stepByStep.title },
     { id: 'whatif', label: tr.whatIf.title },
-    { id: 'gfm', label: tr.gfm.title ?? 'GFM' },
-    { id: 'aoa', label: tr.aoa.title ?? 'AOA' },
+    { id: 'gfm' as TabName, label: tr.gfm.title },
+    { id: 'aoa' as TabName, label: tr.aoa.title },
+    { id: 'quiz' as TabName, label: tr.quiz.title },
   ];
 
   const allTabs = [...primaryTabs, ...secondaryTabs];
@@ -140,6 +142,7 @@ export function TabNavigation() {
           {activeTab === 'whatif' && <WhatIfComparator />}
           {activeTab === 'gfm' && <WorkforceHistogram />}
           {activeTab === 'aoa' && <AOADiagram />}
+          {activeTab === 'quiz' && <QuizMode />}
         </div>
 
         {tr.narration[narrationKey] && (

@@ -89,7 +89,7 @@ export interface Preset {
   productivitate: number;
 }
 
-export type TabName = 'mag' | 'gantt' | 'network' | 'ordine' | 'tabel' | 'steps' | 'whatif' | 'gfm' | 'aoa';
+export type TabName = 'mag' | 'gantt' | 'network' | 'ordine' | 'tabel' | 'steps' | 'whatif' | 'gfm' | 'aoa' | 'quiz';
 export type Theme = 'dark' | 'light';
 export type Lang = 'ro' | 'en';
 
