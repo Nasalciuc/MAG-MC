@@ -44,6 +44,11 @@ export interface Translations {
   timeline: { play: string; pause: string; reset: string; day: string; speed: string };
   quiz: { title: string; start: string; score: string; correct: string; wrong: string; tryAgain: string; qCriticalPath: string; qOptimalT: string; qOptimalOrder: string; qReserve: string; complete: string };
   miniCharts?: { critical: string; durationsPerProc: string; ordersT: string };
+  gfm?: { title: string; coefficient: string; maxWorkers: string; avgWorkers: string; uniform: string; needsFlattening: string; histogram: string; workersPerDay: string; verdict: string };
+  aoa?: { title: string; events: string; realArcs: string; dummyArcs: string; milestone: string; eventNumber: string };
+  budget?: { title: string; salary: string; materials: string; machines: string; directCosts: string; indirectCosts: string; productionTotal: string; profit: string; grandTotal: string; breakdown: string; clickToExpand: string };
+  validation?: { minValue: string; maxValue: string; numbersOnly: string };
+  criticalChain?: { mainChain: string; allNodes: string; parallelBranches: string };
   poster: { generate: string; title: string };
   sounds: { toggle: string };
   exportPng: string;
@@ -125,6 +130,23 @@ export const ro: Translations = {
     complete: 'Quiz complet!',
   },
   miniCharts: { critical: 'Critice', durationsPerProc: 'Durate/P', ordersT: 'Ordini T' },
+  gfm: {
+    title: 'GFM — Forța de Muncă', coefficient: 'Coeficient K', maxWorkers: 'N max',
+    avgWorkers: 'N med', uniform: '✅ Uniform (K ≤ 2)', needsFlattening: '⚠️ Necesită aplatizare (K > 2)',
+    histogram: 'Histogramă muncitori/zi', workersPerDay: 'Muncitori/zi', verdict: 'Verdict',
+  },
+  aoa: {
+    title: 'Grafic AOA', events: 'Evenimente', realArcs: 'Arce reale', dummyArcs: 'Arce fictive',
+    milestone: 'Eveniment', eventNumber: 'Nr. eveniment',
+  },
+  budget: {
+    title: 'Defalcare buget', salary: 'Salarii (B)', materials: 'Materiale',
+    machines: 'Utilaje', directCosts: 'Total directe', indirectCosts: 'Indirecte (12.5%)',
+    productionTotal: 'Total producție', profit: 'Profit (6%)', grandTotal: 'TOTAL',
+    breakdown: 'Defalcare', clickToExpand: 'Click pe buget pentru detalii',
+  },
+  validation: { minValue: 'Valoarea minimă este 1', maxValue: 'Valoarea maximă este 99', numbersOnly: 'Introduceți un număr întreg' },
+  criticalChain: { mainChain: 'Lanț critic principal', allNodes: 'Toate nodurile critice (R=0)', parallelBranches: 'Ramuri critice paralele' },
   poster: { generate: '📐 Poster A3', title: 'MAG Calculator — Poster' },
   sounds: { toggle: '🔊 Sunet' },
   exportPng: '📸 Export PNG',

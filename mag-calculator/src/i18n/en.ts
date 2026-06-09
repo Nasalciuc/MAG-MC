@@ -68,6 +68,23 @@ export const en: Translations = {
     complete: 'Quiz complete!',
   },
   miniCharts: { critical: 'Critical', durationsPerProc: 'Duration/P', ordersT: 'Orders T' },
+  gfm: {
+    title: 'GFM — Workforce', coefficient: 'Coefficient K', maxWorkers: 'N max',
+    avgWorkers: 'N avg', uniform: '✅ Uniform (K ≤ 2)', needsFlattening: '⚠️ Needs flattening (K > 2)',
+    histogram: 'Workers/day histogram', workersPerDay: 'Workers/day', verdict: 'Verdict',
+  },
+  aoa: {
+    title: 'AOA Diagram', events: 'Events', realArcs: 'Real arcs', dummyArcs: 'Dummy arcs',
+    milestone: 'Event', eventNumber: 'Event no.',
+  },
+  budget: {
+    title: 'Budget breakdown', salary: 'Wages (B)', materials: 'Materials',
+    machines: 'Equipment', directCosts: 'Total direct', indirectCosts: 'Indirect (12.5%)',
+    productionTotal: 'Production total', profit: 'Profit (6%)', grandTotal: 'GRAND TOTAL',
+    breakdown: 'Breakdown', clickToExpand: 'Click budget for details',
+  },
+  validation: { minValue: 'Minimum value is 1', maxValue: 'Maximum value is 99', numbersOnly: 'Enter a whole number' },
+  criticalChain: { mainChain: 'Main critical chain', allNodes: 'All critical nodes (R=0)', parallelBranches: 'Parallel critical branches' },
   poster: { generate: '📐 A3 Poster', title: 'MAG Calculator — Poster' },
   sounds: { toggle: '🔊 Sound' },
   exportPng: '📸 Export PNG',

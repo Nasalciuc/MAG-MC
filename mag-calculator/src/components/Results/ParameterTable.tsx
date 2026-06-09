@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { t } from '../../i18n';
 import { PARAM_TOOLTIPS } from '../../lib/constants';
+import { BudgetBreakdown } from '../Budget/BudgetBreakdown';
 import type { MAGResult } from '../../lib/types';
 
 function TooltipTh({ paramKey, label }: { paramKey: string; label: string }) {
@@ -19,6 +21,7 @@ function SingleTable({ magResult, title }: { magResult: MAGResult; title: string
   const procs = ['P1', 'P2', 'P3', 'P4'];
   let totalB = 0;
   const rows: JSX.Element[] = [];
+  const [budgetModal, setBudgetModal] = useState<{ key: string; B: number } | null>(null);
 
   procs.forEach(p => {
     sectors.forEach(s => {
@@ -27,12 +30,22 @@ function SingleTable({ magResult, title }: { magResult: MAGResult; title: string
       rows.push(
         <tr key={`${p}${s}`} style={{ background: n.isCritical ? 'rgba(220,38,38,0.07)' : undefined }}>
           {[
-            `${p}${s}`, n.t, n.ti, n.tt, n.r, n.R, n.tm, n.B, n.N,
+            `${p}${s}`, n.t, n.ti, n.tt, n.r, n.R, n.tm,
           ].map((v, ci) => (
-            <td key={ci} style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center', color: ci === 4 || ci === 5 ? 'var(--yellow)' : ci === 7 ? 'var(--green)' : n.isCritical && (ci === 0 || ci === 5) ? 'var(--red)' : undefined, fontWeight: n.isCritical && ci === 5 ? 700 : undefined }}>
+            <td key={ci} style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center', color: ci === 4 || ci === 5 ? 'var(--yellow)' : n.isCritical && (ci === 0 || ci === 5) ? 'var(--red)' : undefined, fontWeight: n.isCritical && ci === 5 ? 700 : undefined }}>
               {v}
             </td>
           ))}
+          <td
+            onClick={() => setBudgetModal({ key: `${p}${s}`, B: n.B })}
+            style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center', color: 'var(--green)', cursor: 'pointer', textDecoration: 'underline dotted' }}
+            title={tr.budget?.clickToExpand}
+          >
+            {n.B}
+          </td>
+          <td style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center' }}>
+            {n.N}
+          </td>
           <td style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: n.isCritical ? 'var(--red)' : undefined, fontWeight: n.isCritical ? 700 : undefined }}>
             {n.isCritical ? 'DA ✓' : '—'}
           </td>
@@ -43,6 +56,9 @@ function SingleTable({ magResult, title }: { magResult: MAGResult; title: string
 
   return (
     <div className="mb-6">
+      {budgetModal && (
+        <BudgetBreakdown activityKey={budgetModal.key} B={budgetModal.B} onClose={() => setBudgetModal(null)} />
+      )}
       <h3 style={{ fontSize: '1rem', color: 'var(--accent2)', marginBottom: '0.8rem' }}>{title}</h3>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }} role="table">

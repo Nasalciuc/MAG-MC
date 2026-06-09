@@ -206,6 +206,71 @@ export function buildActivities(magResult: MAGResult): ActivityData {
   };
 }
 
+// --- Critical path analysis ---
+
+export function computeLongestCriticalChain(
+  nodes: Record<string, import('./types').MAGNode>,
+  sectors: string[]
+): import('./types').CriticalPathInfo {
+  const procs = ['P1', 'P2', 'P3', 'P4'];
+  const criticalNodes = procs.flatMap(p => sectors.map(s => `${p}${s}`))
+    .filter(key => nodes[key]?.isCritical);
+
+  const critSet = new Set(criticalNodes);
+
+  // BFS/DFS to find all paths through critical nodes
+  const adjCrit: Record<string, string[]> = {};
+  criticalNodes.forEach(key => { adjCrit[key] = []; });
+
+  criticalNodes.forEach(key => {
+    const [p, s] = [key.slice(0, 2), key.slice(2)];
+    const succs = getSuccessors(p, s, sectors);
+    succs.forEach(({ proc, sec }) => {
+      const succKey = `${proc}${sec}`;
+      if (critSet.has(succKey)) adjCrit[key].push(succKey);
+    });
+  });
+
+  // Find start nodes (no critical predecessor)
+  const hasCritPred = new Set<string>();
+  criticalNodes.forEach(key => { adjCrit[key].forEach(s => hasCritPred.add(s)); });
+  const startNodes = criticalNodes.filter(k => !hasCritPred.has(k));
+
+  // DFS to find longest chain
+  let longestChain: string[] = [];
+  const dfs = (node: string, path: string[]) => {
+    const newPath = [...path, node];
+    if (adjCrit[node].length === 0) {
+      if (newPath.length > longestChain.length) longestChain = newPath;
+      return;
+    }
+    adjCrit[node].forEach(next => dfs(next, newPath));
+  };
+  startNodes.forEach(s => dfs(s, []));
+
+  // Find parallel branches (chains from startNodes not in longestChain)
+  const longestSet = new Set(longestChain);
+  const parallelBranches: string[][] = [];
+  startNodes.forEach(s => {
+    if (!longestSet.has(s)) {
+      const branch: string[] = [];
+      let cur = s;
+      while (cur) {
+        branch.push(cur);
+        const nexts = adjCrit[cur].filter(n => !longestSet.has(n));
+        cur = nexts[0] ?? '';
+      }
+      if (branch.length > 0) parallelBranches.push(branch);
+    }
+  });
+
+  return {
+    allCriticalNodes: criticalNodes,
+    longestChain,
+    parallelCriticalBranches: parallelBranches,
+  };
+}
+
 // --- Network edges ---
 
 export function buildNetworkEdges(sectors: string[]): NetworkEdge[] {

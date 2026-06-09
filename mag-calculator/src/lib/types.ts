@@ -89,8 +89,7 @@ export interface Preset {
   productivitate: number;
 }
 
-export type TabName = 'mag' | 'gantt' | 'network' | 'ordine' | 'tabel' | 'steps' | 'whatif';
-// 'quiz' se adaugă în Sprint 4
+export type TabName = 'mag' | 'gantt' | 'network' | 'ordine' | 'tabel' | 'steps' | 'whatif' | 'gfm' | 'aoa';
 export type Theme = 'dark' | 'light';
 export type Lang = 'ro' | 'en';
 
@@ -135,4 +134,61 @@ export interface QuizQuestion {
   options: string[];
   correctIndex: number;
   explanation: string;
+}
+
+// ===== SPRINT 5 TYPES =====
+
+export interface GFMResult {
+  workersPerDay: number[];
+  N_max: number;
+  N_med: number;
+  K: number;
+  uniform: boolean;
+  verdict: 'UNIFORM' | 'NEEDS_FLATTENING';
+}
+
+export interface BudgetBreakdown {
+  salariu: number;
+  materiale: number;
+  masini: number;
+  directe: number;
+  indirecte: number;
+  totalProductie: number;
+  profit: number;
+  total: number;
+}
+
+export interface BudgetConfig {
+  materialeRatio: number;
+  masiniRatio: number;
+  indirecteRatio: number;
+  profitRatio: number;
+}
+
+export interface AOAEvent {
+  id: number;
+  earliestTime: number;
+  latestTime: number;
+  isCritical: boolean;
+}
+
+export interface AOAArc {
+  from: number;
+  to: number;
+  activity?: string;
+  duration: number;
+  isDummy: boolean;
+  isCritical: boolean;
+}
+
+export interface AOAGraph {
+  events: AOAEvent[];
+  arcs: AOAArc[];
+  T: number;
+}
+
+export interface CriticalPathInfo {
+  allCriticalNodes: string[];
+  longestChain: string[];
+  parallelCriticalBranches: string[][];
 }

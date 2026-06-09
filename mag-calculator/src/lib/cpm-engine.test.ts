@@ -182,3 +182,100 @@ describe('runCalculations', () => {
     expect(result.summary.totalBuget).toBe(990);
   });
 });
+
+// ===== SPRINT 5 TESTS =====
+
+import { calcGFM } from './gfm';
+import { calcBudgetBreakdown } from './budget';
+import { buildAOAGraph } from './aoa-builder';
+import { computeLongestCriticalChain } from './cpm-engine';
+
+describe('calcGFM', () => {
+  it('computes K correctly for uniform case', () => {
+    const result = runCalculations(ANEXA2B, { rata: 30, nrMunc: 15, productivitate: 2000 }, ['S1', 'S2', 'S3']);
+    const gfm = calcGFM(result.activityData.activities, result.activityData.totalDuration, 15);
+    expect(gfm.N_max).toBeGreaterThan(0);
+    expect(gfm.N_med).toBeGreaterThan(0);
+    expect(gfm.K).toBeGreaterThan(0);
+    expect(gfm.workersPerDay).toHaveLength(result.activityData.totalDuration);
+  });
+
+  it('K = N_max / N_med', () => {
+    const result = runCalculations(ANEXA2B, { rata: 30, nrMunc: 15, productivitate: 2000 }, ['S1', 'S2', 'S3']);
+    const gfm = calcGFM(result.activityData.activities, result.activityData.totalDuration, 15);
+    expect(Math.abs(gfm.K - gfm.N_max / gfm.N_med)).toBeLessThan(0.01);
+  });
+
+  it('verdict is UNIFORM or NEEDS_FLATTENING based on K', () => {
+    const result = runCalculations(ANEXA2B, { rata: 30, nrMunc: 15, productivitate: 2000 }, ['S1', 'S2', 'S3']);
+    const gfm = calcGFM(result.activityData.activities, result.activityData.totalDuration, 15);
+    expect(gfm.verdict).toBe(gfm.K <= 2 ? 'UNIFORM' : 'NEEDS_FLATTENING');
+  });
+});
+
+describe('calcBudgetBreakdown', () => {
+  it('total = productie + profit', () => {
+    const b = calcBudgetBreakdown(100);
+    expect(Math.abs(b.total - (b.totalProductie + b.profit))).toBeLessThan(0.01);
+  });
+
+  it('directe = salariu + materiale + masini', () => {
+    const b = calcBudgetBreakdown(100);
+    expect(Math.abs(b.directe - (b.salariu + b.materiale + b.masini))).toBeLessThan(0.01);
+  });
+
+  it('zero B gives zero total', () => {
+    const b = calcBudgetBreakdown(0);
+    expect(b.total).toBe(0);
+  });
+});
+
+describe('buildAOAGraph', () => {
+  it('has at least as many events as T+1', () => {
+    const mag = calcMAG(['S1', 'S2', 'S3'], ANEXA2B, 30, 15);
+    const aoa = buildAOAGraph(mag);
+    expect(aoa.events.length).toBeGreaterThan(1);
+    expect(aoa.T).toBeGreaterThan(0);
+  });
+
+  it('all arcs reference valid event IDs', () => {
+    const mag = calcMAG(['S1', 'S2', 'S3'], ANEXA2B, 30, 15);
+    const aoa = buildAOAGraph(mag);
+    const ids = new Set(aoa.events.map(e => e.id));
+    aoa.arcs.forEach(arc => {
+      expect(ids.has(arc.from)).toBe(true);
+      expect(ids.has(arc.to)).toBe(true);
+    });
+  });
+
+  it('has real arcs equal to number of activities', () => {
+    const mag = calcMAG(['S1', 'S2', 'S3'], ANEXA2B, 30, 15);
+    const aoa = buildAOAGraph(mag);
+    const realArcs = aoa.arcs.filter(a => !a.isDummy);
+    expect(realArcs.length).toBe(4 * 3); // 4 procs × 3 sectors
+  });
+});
+
+describe('computeLongestCriticalChain', () => {
+  it('longestChain only contains critical nodes', () => {
+    const mag = calcMAG(['S1', 'S2', 'S3'], ANEXA2B, 30, 15);
+    const info = computeLongestCriticalChain(mag.nodes, mag.sectors);
+    info.longestChain.forEach(key => {
+      expect(mag.nodes[key].isCritical).toBe(true);
+    });
+  });
+
+  it('allCriticalNodes matches R=0 count', () => {
+    const mag = calcMAG(['S1', 'S2', 'S3'], ANEXA2B, 30, 15);
+    const info = computeLongestCriticalChain(mag.nodes, mag.sectors);
+    const critCount = Object.values(mag.nodes).filter(n => n.isCritical).length;
+    expect(info.allCriticalNodes.length).toBe(critCount);
+  });
+
+  it('returns non-empty longestChain for any result', () => {
+    const result = runCalculations(ANEXA2B, { rata: 30, nrMunc: 15, productivitate: 2000 }, ['S1', 'S2', 'S3']);
+    const mag = result.magResults[0];
+    const info = computeLongestCriticalChain(mag.nodes, mag.sectors);
+    expect(info.longestChain.length).toBeGreaterThan(0);
+  });
+});
