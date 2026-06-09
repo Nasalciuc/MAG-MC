@@ -42,7 +42,7 @@ function getInitialState(): Pick<MAGState, 'sectors' | 'durations' | 'params' | 
       const saved = localStorage.getItem(MAG_STORAGE_KEY);
       if (saved) {
         const data = JSON.parse(saved);
-        if (data.sectors && data.durate) {
+        if (data.version === MAG_VERSION && data.sectors && data.durate) {
           return {
             sectors: data.sectors,
             durations: data.durate,

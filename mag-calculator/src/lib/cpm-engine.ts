@@ -248,20 +248,26 @@ export function computeLongestCriticalChain(
   };
   startNodes.forEach(s => dfs(s, []));
 
-  // Find parallel branches (chains from startNodes not in longestChain)
+  // Find parallel branches — check ALL critical nodes for divergences
   const longestSet = new Set(longestChain);
   const parallelBranches: string[][] = [];
-  startNodes.forEach(s => {
-    if (!longestSet.has(s)) {
-      const branch: string[] = [];
-      let cur = s;
-      while (cur) {
-        branch.push(cur);
-        const nexts = adjCrit[cur].filter(n => !longestSet.has(n));
-        cur = nexts[0] ?? '';
+  const visited = new Set<string>();
+
+  criticalNodes.forEach(node => {
+    const critSuccs = adjCrit[node] || [];
+    critSuccs.forEach(succ => {
+      if (!longestSet.has(succ) && !visited.has(succ)) {
+        const branch: string[] = [];
+        let cur: string | undefined = succ;
+        while (cur && !visited.has(cur)) {
+          visited.add(cur);
+          branch.push(cur);
+        const nexts: string[] = (adjCrit[cur] || []).filter(n => !visited.has(n));
+          cur = nexts[0];
+        }
+        if (branch.length > 0) parallelBranches.push(branch);
       }
-      if (branch.length > 0) parallelBranches.push(branch);
-    }
+    });
   });
 
   return {

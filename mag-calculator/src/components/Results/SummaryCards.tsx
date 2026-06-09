@@ -82,7 +82,7 @@ export function SummaryCards() {
       <StatCard label={tr.summary.totalBudget} value={s.totalBuget} unit="mii lei" />
       <StatCard label={tr.summary.optOrders} value={s.optimalCount} unit={`${tr.from} ${s.totalPerms} ${tr.permutations}`} />
       <StatCard label={tr.summary.critActs} value={s.critCount} unit={`${tr.from} ${sectors.length * 4} ${tr.activities}`} critical />
-      <StatCard label={tr.gfm?.coefficient ?? 'K'} value={gfm.K.toFixed(2)} unit={gfm.uniform ? '✅ Uniform' : '⚠️ Neuniform'} critical={!gfm.uniform} />
+      <StatCard label={tr.gfm.coefficient ?? 'K'} value={gfm.K.toFixed(2)} unit={gfm.uniform ? '✅ Uniform' : '⚠️ Neuniform'} critical={!gfm.uniform} />
     </div>
     </>
   );

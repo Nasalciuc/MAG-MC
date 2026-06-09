@@ -8,7 +8,7 @@ export function WorkforceHistogram() {
   const params = useMAGStore(s => s.params);
   const lang = useMAGStore(s => s.lang);
   const tr = t(lang);
-  const gtr = tr.gfm!;
+  const gtr = tr.gfm;
 
   const gfm = useMemo(() => {
     if (!result) return null;
@@ -75,7 +75,7 @@ export function WorkforceHistogram() {
             return (
               <g key={i}>
                 <rect x={x} y={y} width={barW} height={barH2} fill={barColor} opacity={0.75} rx={1} />
-                <title>Ziua {i + 1}: {w} muncitori</title>
+        <title>{`${gtr.day ?? 'Ziua'} ${i + 1}: ${w} ${gtr.workersLabel ?? 'muncitori'}`}</title>
               </g>
             );
           })}

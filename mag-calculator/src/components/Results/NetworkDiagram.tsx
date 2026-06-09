@@ -171,21 +171,21 @@ export function NetworkDiagram() {
       {/* Critical path dual info */}
       <div className="mt-4 p-3 rounded-xl text-xs" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
         <div className="font-semibold mb-2" style={{ color: 'var(--accent2)' }}>
-          {tr.criticalChain?.mainChain ?? 'Lanț critic principal'}
+          {tr.criticalChain.mainChain ?? 'Lanț critic principal'}
         </div>
         <div className="font-mono mb-2" style={{ color: 'var(--red)' }}>
           {critInfo.longestChain.join(' → ')}
         </div>
         {critInfo.parallelCriticalBranches.length > 0 && (
           <div className="mb-2">
-            <span className="font-semibold" style={{ color: 'var(--text2)' }}>{tr.criticalChain?.parallelBranches ?? 'Ramuri paralele'}: </span>
+            <span className="font-semibold" style={{ color: 'var(--text2)' }}>{tr.criticalChain.parallelBranches ?? 'Ramuri paralele'}: </span>
             <span className="font-mono" style={{ color: 'var(--yellow)' }}>
               {critInfo.parallelCriticalBranches.map(b => b.join('→')).join(', ')}
             </span>
           </div>
         )}
         <div style={{ color: 'var(--text2)' }}>
-          <span className="font-semibold">{tr.criticalChain?.allNodes ?? 'Toate R=0'}: </span>
+          <span className="font-semibold">{tr.criticalChain.allNodes ?? 'Toate R=0'}: </span>
           <span className="font-mono">{critInfo.allCriticalNodes.join(', ')}</span>
         </div>
       </div>

@@ -7,7 +7,7 @@ export function AOADiagram() {
   const result = useMAGStore(s => s.result);
   const lang = useMAGStore(s => s.lang);
   const tr = t(lang);
-  const atr = tr.aoa!;
+  const atr = tr.aoa;
 
   const graph = useMemo(() => {
     if (!result) return null;
@@ -121,7 +121,7 @@ export function AOADiagram() {
         </span>
       </div>
       <p className="text-xs mt-1 italic" style={{ color: 'var(--text2)' }}>
-        Format nod: t_e / t_l (earliest / latest time)
+        {atr.nodeFormat ?? 'Format nod: t_e / t_l (earliest / latest time)'}
       </p>
     </div>
   );

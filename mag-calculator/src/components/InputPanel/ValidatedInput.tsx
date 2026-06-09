@@ -11,14 +11,15 @@ interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> 
 export function ValidatedInput({ value, onValidChange, inputStyle, min = 1, max = 99, ...rest }: Props) {
   const lang = useMAGStore(s => s.lang);
   const tr = t(lang);
-  const vtr = tr.validation!;
+  const vtr = tr.validation;
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     if (raw === '') { setError(vtr.numbersOnly); return; }
-    const n = parseInt(raw, 10);
+    const n = Number(raw);
     if (isNaN(n)) { setError(vtr.numbersOnly); return; }
+    if (!Number.isInteger(n)) { setError(vtr.numbersOnly); return; }
     if (n < Number(min)) { setError(vtr.minValue); return; }
     if (n > Number(max)) { setError(vtr.maxValue); return; }
     setError(null);

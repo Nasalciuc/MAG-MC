@@ -33,8 +33,8 @@ export function TabNavigation() {
     { id: 'tabel', label: tr.tabs.tabel },
     { id: 'steps', label: tr.stepByStep.title },
     { id: 'whatif', label: tr.whatIf.title },
-    { id: 'gfm', label: tr.gfm?.title ?? 'GFM' },
-    { id: 'aoa', label: tr.aoa?.title ?? 'AOA' },
+    { id: 'gfm', label: tr.gfm.title ?? 'GFM' },
+    { id: 'aoa', label: tr.aoa.title ?? 'AOA' },
   ];
 
   const allTabs = [...primaryTabs, ...secondaryTabs];

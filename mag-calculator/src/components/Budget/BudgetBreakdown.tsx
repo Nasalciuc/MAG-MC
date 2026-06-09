@@ -11,7 +11,7 @@ interface Props {
 export function BudgetBreakdown({ activityKey, B, onClose }: Props) {
   const lang = useMAGStore(s => s.lang);
   const tr = t(lang);
-  const btr = tr.budget!;
+  const btr = tr.budget;
   const breakdown = calcBudgetBreakdown(B);
 
   const rows: Array<{ label: string; value: number; bold?: boolean; color?: string }> = [
@@ -57,7 +57,7 @@ export function BudgetBreakdown({ activityKey, B, onClose }: Props) {
                   {row.label}
                 </td>
                 <td style={{ padding: '0.4rem 0.6rem', borderBottom: '1px solid var(--border)', textAlign: 'right', fontFamily: 'JetBrains Mono, monospace', color: row.color ?? (row.bold ? 'var(--text)' : 'var(--text2)'), fontWeight: row.bold ? 700 : 400 }}>
-                  {row.value.toFixed(2)} <span style={{ fontSize: '0.7rem' }}>mii lei</span>
+                  {row.value.toFixed(2)} <span style={{ fontSize: '0.7rem' }}>{btr.currencyUnit ?? 'mii lei'}</span>
                 </td>
               </tr>
             ))}

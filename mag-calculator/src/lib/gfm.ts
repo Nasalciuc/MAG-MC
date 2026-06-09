@@ -20,14 +20,15 @@ export function calcGFM(activities: Activity[], T: number, nrMunc: number): GFMR
   const N_max = Math.max(...workersPerDay, 0);
   const totalWorkerDays = workersPerDay.reduce((s, v) => s + v, 0);
   const N_med = days > 0 ? totalWorkerDays / days : 0;
-  const K = N_med > 0 ? N_max / N_med : 0;
+  const rawK = N_med > 0 ? N_max / N_med : 0;
+  const K = Math.round(rawK * 100) / 100;
   const uniform = K <= 2;
 
   return {
     workersPerDay,
     N_max,
     N_med: Math.round(N_med * 100) / 100,
-    K: Math.round(K * 100) / 100,
+    K,
     uniform,
     verdict: uniform ? 'UNIFORM' : 'NEEDS_FLATTENING',
   };

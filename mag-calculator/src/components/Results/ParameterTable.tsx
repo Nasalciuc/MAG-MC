@@ -36,12 +36,15 @@ function SingleTable({ magResult, title }: { magResult: MAGResult; title: string
               {v}
             </td>
           ))}
-          <td
-            onClick={() => setBudgetModal({ key: `${p}${s}`, B: n.B })}
-            style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center', color: 'var(--green)', cursor: 'pointer', textDecoration: 'underline dotted' }}
-            title={tr.budget?.clickToExpand}
-          >
-            {n.B}
+          <td style={{ padding: 0, border: '1px solid var(--border)' }}>
+            <button
+              onClick={() => setBudgetModal({ key: `${p}${s}`, B: n.B })}
+              style={{ background: 'none', border: 'none', padding: '0.6rem 0.8rem', width: '100%', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center', color: 'var(--green)', cursor: 'pointer', textDecoration: 'underline dotted' }}
+              title={tr.budget.clickToExpand}
+              aria-label={`${tr.budget.breakdown} ${p}${s}`}
+            >
+              {n.B}
+            </button>
           </td>
           <td style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center' }}>
             {n.N}

@@ -32,20 +32,24 @@ export function buildAOAGraph(magResult: MAGResult): AOAGraph {
   const timeToEventId: Record<number, number> = {};
   times.forEach((t, i) => { timeToEventId[t] = i; });
 
-  // Late times pentru fiecare eveniment (din backward pass)
+  // Late times: backward pass pe evenimente
   const latestTimes: Record<number, number> = {};
-  times.forEach(t => {
-    latestTimes[timeToEventId[t]] = T; // default
-  });
+  // Default: toate la T
+  times.forEach(t => { latestTimes[timeToEventId[t]] = T; });
+
+  // Pentru fiecare activitate, tighten start + finish events
   procs.forEach(p => {
     sectors.forEach(s => {
       const n = nodes[`${p}${s}`];
-      const eid = timeToEventId[n.t];
-      // Evenimentul de start al activității are lm = tm - ti
-      const lm = n.tm - n.ti;
-      if (lm < latestTimes[eid]) latestTimes[eid] = lm;
+      const startEvt = timeToEventId[n.t];
+      const finishEvt = timeToEventId[n.tt];
+      const lmStart = n.tm - n.ti;
+      if (lmStart < latestTimes[startEvt]) latestTimes[startEvt] = lmStart;
+      if (n.tm < latestTimes[finishEvt]) latestTimes[finishEvt] = n.tm;
     });
   });
+  // Evenimentul start global are lm = 0
+  latestTimes[timeToEventId[0]] = 0;
   // Evenimentul final are lm = T
   latestTimes[timeToEventId[T]] = T;
 
