@@ -14,6 +14,7 @@ function TooltipTh({ paramKey, label }: { paramKey: string; label: string }) {
 
 function SingleTable({ magResult, title }: { magResult: MAGResult; title: string }) {
   const lang = useMAGStore(s => s.lang);
+  const showBudget = useMAGStore(s => s.showBudget);
   const tr = t(lang);
   const { nodes, sectors } = magResult;
   const procs = ['P1', 'P2', 'P3', 'P4'];
@@ -27,12 +28,18 @@ function SingleTable({ magResult, title }: { magResult: MAGResult; title: string
       rows.push(
         <tr key={`${p}${s}`} style={{ background: n.isCritical ? 'rgba(220,38,38,0.07)' : undefined }}>
           {[
-            `${p}${s}`, n.t, n.ti, n.tt, n.r, n.R, n.tm, n.B, n.N,
+            `${p}${s}`, n.t, n.ti, n.tt, n.r, n.R, n.tm,
           ].map((v, ci) => (
-            <td key={ci} style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center', color: ci === 4 || ci === 5 ? 'var(--yellow)' : ci === 7 ? 'var(--green)' : n.isCritical && (ci === 0 || ci === 5) ? 'var(--red)' : undefined, fontWeight: n.isCritical && ci === 5 ? 700 : undefined }}>
+            <td key={ci} style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center', color: ci === 4 || ci === 5 ? 'var(--yellow)' : n.isCritical && (ci === 0 || ci === 5) ? 'var(--red)' : undefined, fontWeight: n.isCritical && ci === 5 ? 700 : undefined }}>
               {v}
             </td>
           ))}
+          {showBudget && (
+            <>
+              <td style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center', color: 'var(--green)' }}>{n.B}</td>
+              <td style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', textAlign: 'center' }}>{n.N}</td>
+            </>
+          )}
           <td style={{ padding: '0.6rem 0.8rem', border: '1px solid var(--border)', textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: n.isCritical ? 'var(--red)' : undefined, fontWeight: n.isCritical ? 700 : undefined }}>
             {n.isCritical ? 'DA ✓' : '—'}
           </td>
@@ -55,13 +62,14 @@ function SingleTable({ magResult, title }: { magResult: MAGResult; title: string
               <TooltipTh paramKey="r" label={tr.table.freeSlack} />
               <TooltipTh paramKey="R" label={tr.table.totalSlack} />
               <TooltipTh paramKey="tm" label={tr.table.lateFinish} />
-              <TooltipTh paramKey="B" label={tr.table.budget} />
-              <TooltipTh paramKey="N" label={tr.table.workers} />
+              {showBudget && <TooltipTh paramKey="B" label={tr.table.budget} />}
+              {showBudget && <TooltipTh paramKey="N" label={tr.table.workers} />}
               <TooltipTh paramKey="" label={tr.table.critical} />
             </tr>
           </thead>
           <tbody>{rows}</tbody>
           <tfoot>
+            {showBudget && (
             <tr>
               <td colSpan={7} style={{ padding: '0.6rem 0.8rem', background: 'var(--surface2)', fontWeight: 700, color: 'var(--green)', textAlign: 'right', border: '1px solid var(--border)' }}>
                 {tr.totalBudgetLabel}
@@ -71,6 +79,7 @@ function SingleTable({ magResult, title }: { magResult: MAGResult; title: string
               </td>
               <td colSpan={2} style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }} />
             </tr>
+            )}
           </tfoot>
         </table>
       </div>

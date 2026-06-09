@@ -38,6 +38,7 @@ function SkeletonCard() {
 export function SummaryCards() {
   const result = useMAGStore(s => s.result);
   const lang = useMAGStore(s => s.lang);
+  const showBudget = useMAGStore(s => s.showBudget);
   const tr = t(lang);
   const [showSkeleton, setShowSkeleton] = useState(false);
   const prevResultRef = useRef(result);
@@ -73,9 +74,9 @@ export function SummaryCards() {
     <MiniCharts />
     <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
       <StatCard label={tr.summary.optDuration} value={s.minT} unit={tr.days} />
-      <StatCard label={`${tr.summary.magDuration} (${sectors.join('→')})`} value={s.firstMAGT} unit={tr.days} />
-      <StatCard label={tr.summary.totalBudget} value={s.totalBuget} unit="mii lei" />
-      <StatCard label={tr.summary.optOrders} value={s.optimalCount} unit={`${tr.from} ${s.totalPerms} ${tr.permutations}`} />
+      <StatCard label={tr.summary.optimalOrder ?? 'Ordinea optimă'} value={result.orderResults[0].order.join('→')} unit={`${s.minT} ${tr.days}`} />
+      <StatCard label={tr.summary.optOrders} value={s.optimalCount} unit={`${tr.from} ${s.totalPerms} ${(tr as { iterations?: string }).iterations ?? tr.permutations}`} />
+      {showBudget && <StatCard label={tr.summary.totalBudget} value={s.totalBuget} unit="mii lei" />}
       <StatCard label={tr.summary.critActs} value={s.critCount} unit={`${tr.from} ${sectors.length * 4} ${tr.activities}`} critical />
     </div>
     </>

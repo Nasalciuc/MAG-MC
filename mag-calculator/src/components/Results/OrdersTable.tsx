@@ -82,8 +82,8 @@ export function OrdersTable() {
             className="p-3 mb-4 rounded-r-lg font-mono text-sm leading-relaxed"
             style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderLeft: '3px solid var(--yellow)', color: 'var(--text2)' }}
           >
-            <span style={{ color: 'var(--yellow)' }}>start(Pi)</span> = max peste k : [ sfârşit_predecesor(k) − durată_proprie_cumulată_înainte_de_k ]<br />
-            P4 pe fiecare sector: predecesor = <span style={{ color: 'var(--yellow)' }}>max(sfârşit P2, sfârşit P3)</span>
+            <span style={{ color: 'var(--yellow)' }}>t(nod)</span> = max(sfârșit proces precedent pe același sector, sfârșit același proces pe sectorul anterior)<br />
+            P4 pe fiecare sector: predecesor tehnologic = <span style={{ color: 'var(--yellow)' }}>max(sfârșit P2, sfârșit P3)</span> pe acel sector. &nbsp; tt = t + ti.
           </div>
 
           <div style={{ overflowX: 'auto' }}>

@@ -175,11 +175,30 @@ describe('N sectors generalization', () => {
 });
 
 describe('runCalculations', () => {
-  it('Anexa 2b: 3 optimal orders out of 6', () => {
+  it('Anexa 2b: minT=17, totalBuget=990, 3 iterations', () => {
     const result = runCalculations(ANEXA2B, { rata: 30, nrMunc: 15, productivitate: 2000 }, ['S1', 'S2', 'S3']);
-    expect(result.summary.optimalCount).toBe(3);
     expect(result.summary.minT).toBe(17);
     expect(result.summary.totalBuget).toBe(990);
+    expect(result.orderResults).toHaveLength(3);
+    expect(result.magResults).toHaveLength(3);
+    expect(result.summary.totalPerms).toBe(3);
+  });
+
+  it('3 standard orders: natural, reverse, swap-last-2', () => {
+    const result = runCalculations(ANEXA2B, { rata: 30, nrMunc: 15, productivitate: 2000 }, ['S1', 'S2', 'S3']);
+    const orders = result.magResults.map(r => r.sectors);
+    expect(orders).toContainEqual(['S1', 'S2', 'S3']);
+    expect(orders).toContainEqual(['S3', 'S2', 'S1']);
+    expect(orders).toContainEqual(['S1', 'S3', 'S2']);
+  });
+});
+
+describe('free slack r = 0 (UTM method)', () => {
+  it('all activities have r=0', () => {
+    const result = calcMAG(['S1', 'S2', 'S3'], ANEXA2B, 30, 15);
+    Object.values(result.nodes).forEach(n => {
+      expect(n.r).toBe(0);
+    });
   });
 });
 

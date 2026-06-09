@@ -16,6 +16,8 @@ interface MAGState {
   activeTab: TabName;
   theme: Theme;
   lang: Lang;
+  showBudget: boolean;
+  toggleBudget: () => void;
 
   setSectors: (sectors: string[]) => void;
   setDuration: (key: string, value: number) => void;
@@ -45,6 +47,9 @@ export const useMAGStore = create<MAGState>((set, get) => ({
   activeTab: 'mag',
   theme: getInitialTheme(),
   lang: getInitialLang(),
+  showBudget: false,
+
+  toggleBudget: () => set(state => ({ showBudget: !state.showBudget })),
 
   setSectors: (sectors) => {
     const { durations, params, sectors: prevSectors } = get();

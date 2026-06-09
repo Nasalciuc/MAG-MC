@@ -102,15 +102,11 @@ export function calcMAG(
     for (const s of sectors) {
       const key = `${p}${s}`;
       const n = nodes[key];
-      const succs = getSuccessors(p, s, sectors);
-
       n.R = n.tm - n.tt;
-      n.r = succs.length === 0
-        ? T - n.tt
-        : Math.min(...succs.map(suc => nodes[`${suc.proc}${suc.sec}`].t)) - n.tt;
+      // Conform ghidului UTM: r = tt - t - ti = 0 mereu în metoda brigăzilor continue
+      n.r = 0;
 
       n.R = Math.max(0, Number(n.R.toFixed(10)));
-      n.r = Math.max(0, Number(n.r.toFixed(10)));
       n.isCritical = n.R === 0;
       n.B = n.ti * rata;
       n.N = nrMunc;
@@ -236,23 +232,30 @@ export function runCalculations(
   sectors: string[]
 ): CalculationResult {
   const { rata, nrMunc, productivitate } = params;
-  const perms = allPermutations(sectors);
+  // 3 iterații standard UTM (nu toate permutările):
+  // 1. Ordinea naturală: S1-S2-S3
+  // 2. Ordinea inversă: S3-S2-S1
+  // 3. Interschimbare ultimele 2: S1-S3-S2
+  const STD_ORDERS = [
+    [...sectors],
+    [...sectors].reverse(),
+    [sectors[0], ...sectors.slice(1).reverse()],
+  ];
 
-  const orderResults: OrderResult[] = perms
-    .map(order => ({ order, T: calcMatrice(order, durate) }))
+  // Calculăm MAG complet pentru fiecare iterație
+  const magResults = STD_ORDERS.map(order =>
+    calcMAG(order, durate, rata, nrMunc, productivitate)
+  );
+
+  const orderResults: OrderResult[] = STD_ORDERS
+    .map((order, i) => ({ order, T: magResults[i].T }))
     .sort((a, b) => a.T - b.T);
 
   const minT = orderResults[0].T;
   const maxT = Math.max(...orderResults.map(r => r.T));
 
-  // Cyclic rotations — pedagogical requirement UTM
-  const magOrders: string[][] = [];
-  for (let i = 0; i < sectors.length; i++)
-    magOrders.push([...sectors.slice(i), ...sectors.slice(0, i)]);
-
-  const magResults = magOrders.map(order =>
-    calcMAG(order, durate, rata, nrMunc, productivitate)
-  );
+  // magOrders = aceleași 3 iterații standard (pentru grid display)
+  const magOrders = STD_ORDERS;
 
   const firstMAG = magResults[0];
   const totalBuget = Object.values(firstMAG.nodes).reduce((a, n) => a + n.B, 0);
@@ -266,7 +269,7 @@ export function runCalculations(
     summary: {
       minT, maxT, firstMAGT: firstMAG.T,
       totalBuget, critCount, optimalCount,
-      totalPerms: perms.length,
+      totalPerms: STD_ORDERS.length,
     },
   };
 }

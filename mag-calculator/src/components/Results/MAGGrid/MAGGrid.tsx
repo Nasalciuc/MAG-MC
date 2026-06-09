@@ -2,10 +2,12 @@ import React from 'react';
 import { useMAGStore } from '../../../store/useMAGStore';
 import { t } from '../../../i18n';
 import { MAGNode } from './MAGNode';
+import { AcademicMatrixSVG } from './AcademicMatrixSVG';
 
 export function MAGGrid() {
   const result = useMAGStore(s => s.result);
   const lang = useMAGStore(s => s.lang);
+  const showBudget = useMAGStore(s => s.showBudget);
   const tr = t(lang);
 
   if (!result) return null;
@@ -47,7 +49,7 @@ export function MAGGrid() {
               className="text-base font-bold px-4 py-2 mb-3 rounded-r-lg"
               style={{ background: 'var(--surface2)', borderLeft: '3px solid var(--accent)', color: 'var(--accent2)' }}
             >
-              📊 MAG — Ordinea {sectors.join(' → ')} &nbsp;|&nbsp; T = <strong>{T} {tr.days}</strong> &nbsp;|&nbsp; Buget = <strong>{totalBuget} mii lei</strong>
+              📊 MAG — Ordinea {sectors.join(' → ')} &nbsp;|&nbsp; T = <strong>{T} {tr.days}</strong>{showBudget && <> &nbsp;|&nbsp; Buget = <strong>{totalBuget} mii lei</strong></>}
             </div>
             <div
               className="p-3 rounded-xl mb-3 text-sm"
@@ -98,6 +100,7 @@ export function MAGGrid() {
                 ))}
               </div>
             </div>
+            <AcademicMatrixSVG result={magResult} />
           </div>
         );
       })}

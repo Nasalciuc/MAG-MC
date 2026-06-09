@@ -1,4 +1,5 @@
 import type { MAGNode as MAGNodeType } from '../../../lib/types';
+import { useMAGStore } from '../../../store/useMAGStore';
 
 interface Props {
   node: MAGNodeType;
@@ -26,6 +27,7 @@ const labelCell: React.CSSProperties = {
 const lastCell: React.CSSProperties = { borderRight: 'none' };
 
 export function MAGNode({ node, nodeKey, animDelay = 0 }: Props) {
+  const showBudget = useMAGStore(s => s.showBudget);
   const isCrit = node.isCritical;
   const critStyle = isCrit ? { color: 'var(--red)', fontWeight: 800 } : {};
   const yStyle = { color: 'var(--yellow)', fontWeight: 600 };
@@ -61,15 +63,31 @@ export function MAGNode({ node, nodeKey, animDelay = 0 }: Props) {
 
       {/* Gray row — values */}
       <div style={{ ...rowGrid, background: 'var(--surface2)' }}>
-        <div style={{ ...cellBase, fontSize: '0.75rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '0.05em' }}>{nodeKey}</div>
-        <div style={{ ...cellBase, ...greenStyle }}>{node.B}</div>
-        <div style={{ ...cellBase, ...lastCell }}>{node.N}</div>
+        {showBudget ? (
+          <>
+            <div style={{ ...cellBase, fontSize: '0.75rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '0.05em' }}>{nodeKey}</div>
+            <div style={{ ...cellBase, ...greenStyle }}>{node.B}</div>
+            <div style={{ ...cellBase, ...lastCell }}>{node.N}</div>
+          </>
+        ) : (
+          <>
+            <div style={{ ...cellBase }} />
+            <div style={{ ...cellBase, fontSize: '0.75rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '0.05em' }}>{nodeKey}</div>
+            <div style={{ ...cellBase, ...lastCell }} />
+          </>
+        )}
       </div>
       {/* Gray row — labels */}
       <div style={{ ...rowGrid, background: 'var(--surface2)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ ...labelCell }}>cod</div>
-        <div style={{ ...labelCell }}>B(mii lei)</div>
-        <div style={{ ...labelCell, ...lastCell }}>N</div>
+        {showBudget ? (
+          <>
+            <div style={{ ...labelCell }}>cod</div>
+            <div style={{ ...labelCell }}>B(mii lei)</div>
+            <div style={{ ...labelCell, ...lastCell }}>N</div>
+          </>
+        ) : (
+          <div style={{ ...labelCell, gridColumn: '1 / -1' }}>cod</div>
+        )}
       </div>
 
       {/* Cream row — labels */}

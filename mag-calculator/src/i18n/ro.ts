@@ -10,7 +10,7 @@ export interface Translations {
   productivity: string;
   calculate: string;
   tabs: { mag: string; gantt: string; network: string; ordine: string; tabel: string };
-  summary: { optDuration: string; magDuration: string; totalBudget: string; optOrders: string; critActs: string };
+  summary: { optDuration: string; magDuration: string; totalBudget: string; optOrders: string; critActs: string; optimalOrder?: string };
   table: { activity: string; start: string; duration: string; finish: string; freeSlack: string; totalSlack: string; lateFinish: string; budget: string; workers: string; critical: string };
   days: string;
   from: string;
@@ -49,6 +49,8 @@ export interface Translations {
   exportPng: string;
   moreActions: string;
   install: string;
+  showBudget: string;
+  iterations?: string;
 }
 
 export const ro: Translations = {
@@ -63,7 +65,7 @@ export const ro: Translations = {
   productivity: 'Productivitate (lei/muncitor/schimb)',
   calculate: '⚡ Calculează MAG complet',
   tabs: { mag: 'Grila MAG', gantt: 'Gantt Chart', network: 'Grafic-Rețea', ordine: 'Toate Ordinile', tabel: 'Tabel Parametri' },
-  summary: { optDuration: 'Durată optimă (Matrice)', magDuration: 'Durată MAG', totalBudget: 'Buget total proiect', optOrders: 'Ordini optime', critActs: 'Activități critice' },
+  summary: { optDuration: 'Durată optimă (MAG)', magDuration: 'Durată MAG', totalBudget: 'Buget total proiect', optOrders: 'Ordini optime', critActs: 'Activități critice', optimalOrder: 'Ordinea optimă' },
   table: { activity: 'Activitate', start: 't (start)', duration: 'ti (durată)', finish: 'tt (terminare)', freeSlack: 'r (rez. liberă)', totalSlack: 'R (rez. totală)', lateFinish: 'tm (term. max)', budget: 'B (mii lei)', workers: 'N', critical: 'Critic' },
   days: 'zile', from: 'din', permutations: 'permutări', activities: 'activități',
   share: '📋 Copiază link', exportPdf: '📄 Export PDF', saveJson: '💾 Salvează JSON', loadJson: '📂 Încarcă JSON',
@@ -72,7 +74,7 @@ export const ro: Translations = {
   totalBudgetLabel: 'TOTAL BUGET',
   optimal: '✓ OPTIM', worst: 'Cel mai slab', suboptimal: 'Suboptim',
   goldenRule: 'Regula de aur',
-  goldenRuleText: 'P2 și P3 pornesc numai după P1 pe acel sector. P4 pornește numai după ambele P2 și P3.',
+  goldenRuleText: 'P2 și P3 pornesc numai după P1 pe acel sector. P4 pornește numai după ambele P2 și P3. Se calculează cele 3 iterații standard (S1-S2-S3, S3-S2-S1, S1-S3-S2); cea optimă e marcată.',
   costHint: 'mii lei / zi / proces',
   workersHint: 'persoane',
   productivityHint: 'lei / muncitor / schimb',
@@ -130,4 +132,6 @@ export const ro: Translations = {
   exportPng: '📸 Export PNG',
   moreActions: 'Mai multe...',
   install: '📲 Instalează',
+  showBudget: 'Calculează și bugetul (N, B în celule)',
+  iterations: 'iterații',
 };
