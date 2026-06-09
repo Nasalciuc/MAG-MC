@@ -36,11 +36,33 @@ const getInitialTheme = (): Theme =>
 const getInitialLang = (): Lang =>
   typeof window !== 'undefined' ? ((localStorage.getItem('mag-lang') as Lang) || 'ro') : 'ro';
 
+function getInitialState(): Pick<MAGState, 'sectors' | 'durations' | 'params' | 'selectedPreset'> {
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem(MAG_STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.version === MAG_VERSION && data.sectors && data.durate) {
+          return {
+            sectors: data.sectors,
+            durations: data.durate,
+            params: { rata: data.rata ?? 30, nrMunc: data.nrMunc ?? 15, productivitate: data.productivitate ?? 2000 },
+            selectedPreset: 'custom',
+          };
+        }
+      }
+    } catch { /* ignore */ }
+  }
+  return {
+    sectors: DEFAULT_SECTORS,
+    durations: { ...MAG_PRESETS['anexa2b'].durations },
+    params: { rata: 30, nrMunc: 15, productivitate: 2000 },
+    selectedPreset: 'anexa2b',
+  };
+}
+
 export const useMAGStore = create<MAGState>((set, get) => ({
-  sectors: DEFAULT_SECTORS,
-  durations: { ...MAG_PRESETS['anexa2b'].durations },
-  params: { rata: 30, nrMunc: 15, productivitate: 2000 },
-  selectedPreset: 'anexa2b',
+  ...getInitialState(),
   result: null,
   activeTab: 'mag',
   theme: getInitialTheme(),

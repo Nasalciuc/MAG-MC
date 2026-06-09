@@ -34,6 +34,14 @@ export function StepByStep() {
     return () => clearInterval(timer);
   }, [autoPlay, steps.length]);
 
+  const activityToStepIndex = useMemo(() => {
+    const map: Record<string, number> = {};
+    steps.forEach((step, idx) => {
+      if (!(step.nodeId in map)) map[step.nodeId] = idx;
+    });
+    return map;
+  }, [steps]);
+
   if (!result || steps.length === 0) return null;
 
   const current = steps[stepIdx];
@@ -97,12 +105,14 @@ export function StepByStep() {
             return (
               <div
                 key={key}
+                onClick={() => setStepIdx(activityToStepIndex[key] ?? 0)}
                 className="px-3 py-2 rounded-lg font-mono text-xs font-bold transition-all"
                 style={{
                   background: isCrit ? 'var(--critical-bg)' : active ? 'var(--bleu)' : 'var(--surface2)',
                   border: `2px solid ${isCrit ? 'var(--red)' : active ? 'var(--accent)' : 'var(--border)'}`,
                   color: isCrit ? 'var(--red)' : active ? 'var(--accent2)' : 'var(--text2)',
                   opacity: active ? 1 : 0.35,
+                  cursor: 'pointer',
                 }}
               >
                 {key}

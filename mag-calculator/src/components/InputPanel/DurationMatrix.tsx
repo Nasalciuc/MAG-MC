@@ -1,6 +1,7 @@
 import React from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { PROCESS_LABELS } from '../../lib/constants';
+import { ValidatedInput } from './ValidatedInput';
 
 function heatmapBg(val: number, allVals: number[]): string {
   if (allVals.length === 0) return 'var(--surface2)';
@@ -35,15 +36,6 @@ export function DurationMatrix() {
     outline: 'none',
   };
 
-  const handleChange = (key: string, val: string) => {
-    if (val === '') return;
-    const n = parseInt(val, 10);
-    if (!isNaN(n) && n >= 1 && n <= 99) {
-      setDuration(key, n);
-      calculate();
-    }
-  };
-
   return (
     <div
       id="onboarding-matrix"
@@ -67,18 +59,17 @@ export function DurationMatrix() {
           {sectors.map(s => {
             const k = `${p}${s}`;
             return (
-              <input
+              <ValidatedInput
                 key={k}
-                type="number"
                 id={`d_${k}`}
+                value={durations[k] ?? 1}
                 min={1}
                 max={99}
                 step={1}
-                value={durations[k] ?? ''}
-                onChange={e => handleChange(k, e.target.value)}
+                onValidChange={v => { setDuration(k, v); calculate(); }}
                 onKeyDown={e => e.key === 'Enter' && calculate()}
                 aria-label={`Durata ${p} pe ${s}`}
-                style={{ ...inputStyle, background: heatmapBg(durations[k] ?? 0, allVals) }}
+                inputStyle={{ ...inputStyle, background: heatmapBg(durations[k] ?? 0, allVals) }}
               />
             );
           })}

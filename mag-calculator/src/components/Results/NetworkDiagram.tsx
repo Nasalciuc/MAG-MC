@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useMAGStore } from '../../store/useMAGStore';
 import { ExportImageBtn } from '../ExportImage';
-import { buildNetworkEdges } from '../../lib/cpm-engine';
+import { buildNetworkEdges, computeLongestCriticalChain } from '../../lib/cpm-engine';
+import { t } from '../../i18n';
 import type { NetworkEdge } from '../../lib/types';
 
 const PROC_INDEX: Record<string, number> = { P1: 0, P2: 1, P3: 2, P4: 3 };
@@ -54,6 +55,8 @@ function edgePath(edge: NetworkEdge, sectors: string[]): string {
 
 export function NetworkDiagram() {
   const result = useMAGStore(s => s.result);
+  const lang = useMAGStore(s => s.lang);
+  const tr = t(lang);
   const svgRef = useRef<SVGSVGElement>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
@@ -63,6 +66,9 @@ export function NetworkDiagram() {
   const { nodes, sectors } = mag;
   const procs = ['P1', 'P2', 'P3', 'P4'];
   const edges = buildNetworkEdges(sectors);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const critInfo = useMemo(() => computeLongestCriticalChain(nodes, sectors), [nodes, sectors]);
 
   const svgW = PADDING * 2 + sectors.length * CELL_W - GAP_X + NODE_W;
   const svgH = PADDING * 2 + 4 * CELL_H - GAP_Y + NODE_H;
@@ -160,6 +166,28 @@ export function NetworkDiagram() {
         <span><span style={{ display: 'inline-block', width: 20, height: 2, background: 'var(--green)', verticalAlign: 'middle', marginRight: 4 }} />Continuitate brigadă</span>
         <span><span style={{ display: 'inline-block', width: 20, height: 2, background: 'var(--accent2)', verticalAlign: 'middle', marginRight: 4 }} />Tehnologic (P1→P2/P3, P2/P3→P4)</span>
         <span><span style={{ display: 'inline-block', width: 20, height: 2, background: 'var(--red)', verticalAlign: 'middle', marginRight: 4 }} />Drum critic</span>
+      </div>
+
+      {/* Critical path dual info */}
+      <div className="mt-4 p-3 rounded-xl text-xs" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
+        <div className="font-semibold mb-2" style={{ color: 'var(--accent2)' }}>
+          {tr.criticalChain.mainChain ?? 'Lanț critic principal'}
+        </div>
+        <div className="font-mono mb-2" style={{ color: 'var(--red)' }}>
+          {critInfo.longestChain.join(' → ')}
+        </div>
+        {critInfo.parallelCriticalBranches.length > 0 && (
+          <div className="mb-2">
+            <span className="font-semibold" style={{ color: 'var(--text2)' }}>{tr.criticalChain.parallelBranches ?? 'Ramuri paralele'}: </span>
+            <span className="font-mono" style={{ color: 'var(--yellow)' }}>
+              {critInfo.parallelCriticalBranches.map(b => b.join('→')).join(', ')}
+            </span>
+          </div>
+        )}
+        <div style={{ color: 'var(--text2)' }}>
+          <span className="font-semibold">{tr.criticalChain.allNodes ?? 'Toate R=0'}: </span>
+          <span className="font-mono">{critInfo.allCriticalNodes.join(', ')}</span>
+        </div>
       </div>
     </div>
   );
