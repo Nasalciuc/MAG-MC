@@ -27,6 +27,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+      <canvas id="confetti-canvas" className="fixed inset-0 pointer-events-none" style={{ zIndex: 9999 }} />
       <div
         className="fixed inset-0 pointer-events-none"
         style={{

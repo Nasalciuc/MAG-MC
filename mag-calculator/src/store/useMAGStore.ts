@@ -21,7 +21,7 @@ interface MAGState {
   setDuration: (key: string, value: number) => void;
   setParam: <K extends keyof CalcParams>(key: K, value: CalcParams[K]) => void;
   loadPreset: (key: string) => void;
-  calculate: () => void;
+  calculate: (celebrate?: boolean) => void;
   setActiveTab: (tab: TabName) => void;
   toggleTheme: () => void;
   toggleLang: () => void;
@@ -93,11 +93,18 @@ export const useMAGStore = create<MAGState>((set, get) => ({
     setTimeout(() => get().calculate(), 0);
   },
 
-  calculate: () => {
+  calculate: (celebrate = false) => {
     const { durations, params, sectors } = get();
     try {
       const result = runCalculations(durations, params, sectors);
       set({ result });
+      if (celebrate) {
+        import('../lib/confetti').then(({ fireConfetti }) => {
+          const canvas = document.getElementById('confetti-canvas') as HTMLCanvasElement | null;
+          if (canvas) fireConfetti(canvas);
+        });
+        import('../lib/sounds').then(({ playSuccess }) => playSuccess());
+      }
       try {
         localStorage.setItem(MAG_STORAGE_KEY, JSON.stringify({
           version: MAG_VERSION, saved: new Date().toISOString(),

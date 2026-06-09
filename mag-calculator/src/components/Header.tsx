@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useMAGStore } from '../store/useMAGStore';
 import { t } from '../i18n';
 import { useShareURL } from '../hooks/useShareURL';
 import { exportJSON, importJSON, downloadFile } from '../lib/serialization';
+import { toggleSound, isSoundEnabled } from '../lib/sounds';
 
 const btnStyle: React.CSSProperties = {
   background: 'var(--surface2)',
@@ -28,11 +30,19 @@ export function Header() {
   const importState = useMAGStore(s => s.importState);
   const tr = t(lang);
   const { shareURL, copied } = useShareURL();
+  const [soundOn, setSoundOn] = useState(isSoundEnabled);
+  const [showMore, setShowMore] = useState(false);
 
   const handleExportPdf = async () => {
     if (!result) return;
     const { exportPDF } = await import('../lib/pdf');
     await exportPDF(result);
+  };
+
+  const handlePoster = async () => {
+    if (!result) return;
+    const { exportPosterA3 } = await import('../lib/pdf');
+    await exportPosterA3(result);
   };
 
   const handleSaveJson = () => {
@@ -61,10 +71,14 @@ export function Header() {
     input.click();
   };
 
+  const handleSoundToggle = () => {
+    setSoundOn(toggleSound());
+  };
+
   return (
     <header className="text-center py-10 pb-6">
       <div
-        className="inline-block text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-6"
+        className="inline-block text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-6 glass-panel"
         style={{ background: 'linear-gradient(135deg,#1e3a5f,#2563eb)', color: '#93c5fd', border: '1px solid #3b82f6' }}
       >
         {tr.badge}
@@ -78,13 +92,26 @@ export function Header() {
       <p className="text-base max-w-xl mx-auto leading-relaxed mb-6" style={{ color: 'var(--text2)' }}>
         {tr.subtitle}
       </p>
-      <div className="flex gap-2 justify-center flex-wrap">
+      <div className="flex gap-2 justify-center flex-wrap relative">
         <button style={btnStyle} onClick={toggleTheme}>{theme === 'dark' ? tr.light : tr.dark}</button>
         <button style={btnStyle} onClick={toggleLang}>{lang === 'ro' ? 'EN 🌐' : 'RO 🌐'}</button>
         <button style={btnStyle} onClick={shareURL}>{copied ? tr.copySuccess : tr.share}</button>
         <button style={btnStyle} onClick={handleExportPdf}>{tr.exportPdf}</button>
-        <button style={btnStyle} onClick={handleSaveJson}>{tr.saveJson}</button>
-        <button style={btnStyle} onClick={handleLoadJson}>{tr.loadJson}</button>
+        <button style={btnStyle} onClick={() => setShowMore(m => !m)}>{tr.moreActions}</button>
+
+        {showMore && (
+          <div
+            className="absolute top-full mt-2 flex flex-col gap-1 p-2 rounded-xl z-20"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)', minWidth: 160 }}
+          >
+            <button style={{ ...btnStyle, width: '100%', textAlign: 'left' }} onClick={() => { handleSaveJson(); setShowMore(false); }}>{tr.saveJson}</button>
+            <button style={{ ...btnStyle, width: '100%', textAlign: 'left' }} onClick={() => { handleLoadJson(); setShowMore(false); }}>{tr.loadJson}</button>
+            <button style={{ ...btnStyle, width: '100%', textAlign: 'left' }} onClick={() => { handlePoster(); setShowMore(false); }}>{tr.poster.generate}</button>
+            <button style={{ ...btnStyle, width: '100%', textAlign: 'left' }} onClick={handleSoundToggle}>
+              {soundOn ? '🔊' : '🔇'} {tr.sounds.toggle}
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );

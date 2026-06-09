@@ -8,6 +8,7 @@ import { OrdersTable } from './OrdersTable';
 import { ParameterTable } from './ParameterTable';
 import { StepByStep } from '../StepByStep/StepByStep';
 import { WhatIfComparator } from '../WhatIf/WhatIfComparator';
+import { QuizMode } from '../Quiz/QuizMode';
 
 export function TabNavigation() {
   const lang = useMAGStore(s => s.lang);
@@ -26,6 +27,7 @@ export function TabNavigation() {
     { id: 'tabel', label: tr.tabs.tabel },
     { id: 'steps', label: tr.stepByStep.title },
     { id: 'whatif', label: tr.whatIf.title },
+    { id: 'quiz', label: tr.quiz.title },
   ];
 
   const handleKeyDown = (e: React.KeyboardEvent, idx: number) => {
@@ -80,6 +82,7 @@ export function TabNavigation() {
           {activeTab === 'tabel' && <ParameterTable />}
           {activeTab === 'steps' && <StepByStep />}
           {activeTab === 'whatif' && <WhatIfComparator />}
+          {activeTab === 'quiz' && <QuizMode />}
         </div>
 
         {tr.narration[narrationKey] && (

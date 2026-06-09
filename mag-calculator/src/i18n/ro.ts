@@ -42,7 +42,7 @@ export interface Translations {
   stepByStep: { title: string; forward: string; backward: string; reserves: string; critical: string; next: string; prev: string; play: string; explain: string };
   whatIf: { title: string; original: string; alternative: string; diff: string; better: string; worse: string };
   timeline: { play: string; pause: string; reset: string; day: string; speed: string };
-  quiz: { title: string; start: string; score: string; correct: string; wrong: string; tryAgain: string; qCriticalPath: string; qOptimalT: string; qOptimalOrder: string; qReserve: string; complete: string };
+  quiz: { title: string; start: string; score: string; correct: string; wrong: string; tryAgain: string; question: string; qCriticalPath: string; qOptimalT: string; qOptimalOrder: string; qReserve: string; complete: string };
   miniCharts?: { critical: string; durationsPerProc: string; ordersT: string };
   poster: { generate: string; title: string };
   sounds: { toggle: string };
@@ -117,7 +117,7 @@ export const ro: Translations = {
   quiz: {
     title: 'Quiz Mode', start: '🎯 Începe Quiz',
     score: 'Scor', correct: 'Corect!', wrong: 'Greșit!',
-    tryAgain: 'Încearcă din nou',
+    tryAgain: 'Încearcă din nou', question: 'Întrebarea',
     qCriticalPath: 'Care e drumul critic?',
     qOptimalT: 'Cât e durata optimă?',
     qOptimalOrder: 'Care ordine e optimă?',

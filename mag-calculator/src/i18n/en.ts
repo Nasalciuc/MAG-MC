@@ -60,7 +60,7 @@ export const en: Translations = {
   quiz: {
     title: 'Quiz Mode', start: '🎯 Start Quiz',
     score: 'Score', correct: 'Correct!', wrong: 'Wrong!',
-    tryAgain: 'Try again',
+    tryAgain: 'Try again', question: 'Question',
     qCriticalPath: 'What is the critical path?',
     qOptimalT: 'What is the optimal duration?',
     qOptimalOrder: 'Which order is optimal?',

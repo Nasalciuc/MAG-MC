@@ -89,8 +89,7 @@ export interface Preset {
   productivitate: number;
 }
 
-export type TabName = 'mag' | 'gantt' | 'network' | 'ordine' | 'tabel' | 'steps' | 'whatif';
-// 'quiz' se adaugă în Sprint 4
+export type TabName = 'mag' | 'gantt' | 'network' | 'ordine' | 'tabel' | 'steps' | 'whatif' | 'quiz';
 export type Theme = 'dark' | 'light';
 export type Lang = 'ro' | 'en';
 

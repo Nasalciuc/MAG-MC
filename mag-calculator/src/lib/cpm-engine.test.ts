@@ -182,3 +182,16 @@ describe('runCalculations', () => {
     expect(result.summary.totalBuget).toBe(990);
   });
 });
+
+describe('Quiz Engine', () => {
+  it('generates 5 questions with valid correctIndex', async () => {
+    const { generateQuiz } = await import('./quiz-engine');
+    const result = runCalculations(ANEXA2B, { rata: 30, nrMunc: 15, productivitate: 2000 }, ['S1', 'S2', 'S3']);
+    const quiz = generateQuiz(result);
+    expect(quiz.length).toBe(5);
+    quiz.forEach(q => {
+      expect(q.correctIndex).toBeGreaterThanOrEqual(0);
+      expect(q.correctIndex).toBeLessThan(q.options.length);
+    });
+  });
+});
